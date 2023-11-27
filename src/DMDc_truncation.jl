@@ -1,5 +1,5 @@
 X₀, X₁ = features[:,1:end-1], features[:,2:end]
-ScalingVec = sum(X₀, dims = 2) * horizon
+ScalingVec = sum(X₀, dims = 2) ./ horizon
 #ScalingVec[1:n+1] ./= 2
 S = inv(LinearAlgebra.Diagonal(ScalingVec[:]))
 X₀, X₁ = S * X₀, S * X₁
@@ -10,7 +10,7 @@ for i in 1:delays
 end
 XX₀ = XX[:,1:end-1]
 XX₁ = XX[:,2:end]
-ScalingVec = sum(XX₀, dims = 2) * horizon
+ScalingVec = sum(XX₀, dims = 2) ./ horizon
 SS = inv(LinearAlgebra.Diagonal(ScalingVec[:])) #LinearAlgebra.Diagonal(1 ./ ScalingVec[:])
 XX₀ = SS * XX₀
 XX₁ = SS * XX₁
@@ -18,7 +18,7 @@ XX₁ = SS * XX₁
 Ω = [X₀; U_rec]
 Ω₂ = [X₀; U_rec; X₀ .* U_rec]
 ΩΩ = [XX₀; U_rec[:,delays+1:end]]
-numberOfstates = 25
+numberOfstates = 40
 reduction = 1 - numberOfstates / Nfeatures
 Truncation = floor(Int, Nfeatures * (1-reduction))
 Truncation1 = floor(Int, 2 * Truncation)#Truncation + floor(Int, reduction * Truncation)

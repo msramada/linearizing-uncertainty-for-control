@@ -1,13 +1,12 @@
-A = [1.0;;]
+A = [0.95;;]
 B = [1.0;;]
 
 K_lqr = lqr(Discrete, A, B, I, I)
 Q_features_lqr = LinearAlgebra.diagm(zeros(size(SysTruncated1.A)[1],))
-Q_features_lqr[1,1] = 1.0
-Q_features_lqr[n+1,n+1] = 1.0
+Q_features_lqr[1:NinfoState,1:NinfoState] = I(NinfoState)
 K₁ = lqr(SysTruncated1, Q_features_lqr, I)
 simHorizon = 200
-l₀ = state_Σ_trace(x₀, Σ₀, dyna)
+l₀ = make_info_state(x₀, Σ₀, dyna, infoType)
 x_true1 = zeros(n, simHorizon+1)
 lₖ = zeros(NinfoState, simHorizon+1)
 lₖ[:,1] = l₀
@@ -23,7 +22,7 @@ let Σ₁ = Σ₀
 		#xₚ, _ = eKF.time_update(x₁, Σ₁, u₀, dyna)
 		#y_true = dyna.h(xₚ)
 		x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
-		lₖ[:,k+1] = state_Σ_trace(x₁, Σ₁, dyna)
+		lₖ[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
 	end
 end
 end
@@ -43,7 +42,7 @@ let Σ₁ = Σ₀
 		#xₚ, _ = eKF.time_update(x₁, Σ₁, u₀, dyna)
 		#y_true = dyna.h(xₚ)
 		x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
-		bₖ[:,k+1] = state_Σ_trace(x₁, Σ₁, dyna)
+		bₖ[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
 	end
 end
 end

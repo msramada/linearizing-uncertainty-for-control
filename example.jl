@@ -13,7 +13,7 @@ n = dyna.n
 
 #### Feature vector params #####
 delays =0 # Number of delays in the Hankel-based basis
-order = 4 # Highest degree of multinomial
+order = 3 # Highest degree of multinomial
 make_feature = x -> makeFeature1(x, order, dyna)
 horizon = 10000
 x_true = zeros(n, horizon+1)
@@ -36,13 +36,13 @@ println("Start simulation ... ")
 let x₁ = x₀
 let Σ₁ = Σ₀
 	for k in 1:horizon
-		u₀ = sqrt(1.5) * randn(1,)
+		u₀ = sqrt(2.5) * randn(1,)
 		U_rec[:,k] = u₀
 		x_true[:,k+1] = eKF.next_state_sample(x_true[:,k], u₀, dyna)
 		y_true = eKF.output_sample(x_true[:,k+1], dyna)
 		Y_rec[:,k+1] = y_true
-		#xₚ, _ = eKF.time_update(x₁, Σ₁, u₀, dyna)
-		#y_true = dyna.h(xₚ)
+		xₚ, _ = eKF.time_update(x₁, Σ₁, u₀, dyna)
+		y_true = dyna.h(xₚ)
 		x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
 		lₖ[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
 		features[:,k+1] = make_feature(lₖ[:,k+1])
@@ -53,4 +53,4 @@ println("Features data has been collected.")
 
 include("src/DMDc_truncation.jl")
 
-#include("src/feedbackSim.jl")
+include("src/feedbackSim.jl")
