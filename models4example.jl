@@ -1,9 +1,9 @@
 ##### Dynamic System Definition #####
 function observFun1(x)
 	if (x > 0)
-	return 0.1 * x
+	return 0.05 .* x
 	else
-	return 0.5 * x 
+	return 2 .* x
 	end
 end
 
