@@ -68,7 +68,7 @@ function makeFeature_Obs(l::Vector{Float64}, order::Int, DynamicSysObj) # return
 	g = DynamicSysObj.h(l[1:DynamicSysObj.n])
 	g = [1.0; g]
 	lₚ = g
-	for i in 1:order+5
+	for i in 1:order+6
 		lₚ = vectorize(lₚ * g')
 	end
 	return lₚ

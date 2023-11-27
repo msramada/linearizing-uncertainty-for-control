@@ -36,7 +36,7 @@ println("Start simulation ... ")
 let x₁ = x₀
 let Σ₁ = Σ₀
 	for k in 1:horizon
-		u₀ = sqrt(2.5) * randn(1,)
+		u₀ = sqrt(10) * randn(1,)
 		U_rec[:,k] = u₀
 		x_true[:,k+1] = eKF.next_state_sample(x_true[:,k], u₀, dyna)
 		y_true = eKF.output_sample(x_true[:,k+1], dyna)

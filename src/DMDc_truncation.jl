@@ -1,5 +1,6 @@
 X₀, X₁ = features[:,1:end-1], features[:,2:end]
 ScalingVec = sum(X₀, dims = 2) ./ horizon
+ScalingVec[1:NinfoState] .*= 1/2
 #ScalingVec[1:n+1] ./= 2
 S = inv(LinearAlgebra.Diagonal(ScalingVec[:]))
 X₀, X₁ = S * X₀, S * X₁
@@ -18,7 +19,7 @@ XX₁ = SS * XX₁
 Ω = [X₀; U_rec]
 Ω₂ = [X₀; U_rec; X₀ .* U_rec]
 ΩΩ = [XX₀; U_rec[:,delays+1:end]]
-numberOfstates = 40
+numberOfstates = 20
 reduction = 1 - numberOfstates / Nfeatures
 Truncation = floor(Int, Nfeatures * (1-reduction))
 Truncation1 = floor(Int, 2 * Truncation)#Truncation + floor(Int, reduction * Truncation)
@@ -96,22 +97,22 @@ PredFeatures2 = ls_lsim(Ā, B̄, B̄ₓ * Û, [U_rec 0], feature0=xTrunc0)
 PredFeatures2 = inv(S) * Û * PredFeatures2
 PredFeatures2[:,1] = features[:,1]
 
-######### Carlemann ###############
 ######### Plotting ###############
 plotting_horizon = 300
 start = 50
 kk = 1
 p1 = plot(features[kk,1:plotting_horizon])
 p1 = plot!(PredFeatures1[kk,1:plotting_horizon])
-#p1 = plot!(PredFeatures2[kk,1:plotting_horizon])
+p1 = plot!(PredFeatures2[kk,1:plotting_horizon])
 #p1 = plot!(PPredFeatures1[kk,1:plotting_horizon])
 
 kk = n+1
 p2 = plot(features[kk,1:plotting_horizon])
 p2 = plot!(PredFeatures1[kk,1:plotting_horizon])
-#p2 = plot!(PredFeatures2[kk,1:plotting_horizon])
+p2 = plot!(PredFeatures2[kk,1:plotting_horizon])
 #p2 = plot!(PPredFeatures1[kk,1:plotting_horizon])
 
 
 
-plot(p1,p2, layout=(2,1), reuse = false)
+display(plot(p1,p2, layout=(2,1), reuse = false))
+#savefig("myplot.png")
