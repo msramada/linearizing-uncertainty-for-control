@@ -15,7 +15,7 @@ model = Chain(
 	Dense(Nhidden, Noutput)
 	)
 
-params, st = Lux.setup(rng, model)
+params, ls = Lux.setup(rng, model)
 
 function loss_fn(p, ls, A, B, U, X, X⁺)
 	Features, _ = model(X, p, ls)
@@ -28,16 +28,19 @@ end
 opt = Optimisers.Adam(η)
 opt_state = Optimisers.setup(opt, params)
 
-A = randn(NinfoState, NinfoState)
-B = randn(NinfoState, 1)
+A = randn(liftedDim, liftedDim)
+B = randn(liftedDim, 1)
 loss_history = []
+
 
 for j in 1:N_LEAST_SQS
 for epoch in 1:N_EPOCHS
-	indices = rand(1:horizon, BATCH_SIZE)
+	indices = rand(1:horizon-1, BATCH_SIZE)
 	πₖ = lₖ[:,indices]
 	πₖ⁺ = lₖ[:,indices .+ 1]
-	Loss, _ = Zygote.pullback(loss_fn, params, ls, A, B, U, πₖ, πₖ⁺)
+	U = U_rec[:,indices]
+	global ps = params
+	Loss, _ = Zygote.pullback(p -> loss_fn(p, ls, A, B, U, πₖ, πₖ⁺), ps)
 	grad, _ = back((1.0, nothing))
 	ops, ps = Optimisers.update(opt_state, params, grad)
 	params = ps
