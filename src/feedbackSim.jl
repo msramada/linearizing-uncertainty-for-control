@@ -9,18 +9,18 @@ K₁ = lqr(SysTruncated1, Q_features_lqr, I)
 simHorizon = 200
 l₀ = make_info_state(x₀, Σ₀, dyna, infoType)
 x_true1 = zeros(n, simHorizon+1)
-lₖ = zeros(NinfoState, simHorizon+1)
-lₖ[:,1] = l₀
+bbₖ = zeros(NinfoState, simHorizon+1)
+bbₖ[:,1] = l₀
 let x₁ = x₀
 let Σ₁ = Σ₀
 	for k in 1:simHorizon
-		u₀ = - K₁ * Û' * S * make_feature(lₖ[:,k])
+		u₀ = - K₁ * Û' * S * make_feature(bbₖ[:,k])
 		#U_rec[:,k] = u₀
 		x_true1[:,k+1] = eKF.next_state_sample(x_true1[:,k], u₀, dyna)
 		y_true = eKF.output_sample(x_true1[:,k+1], dyna)
 		Y_rec[:,k+1] = y_true
 		x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
-		lₖ[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
+		bbₖ[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
 	end
 end
 end
@@ -44,10 +44,10 @@ end
 end
 
 a1 = plot(bₖ[1,:], ylabel = L"$z_k$", label="LQR")
-a1 = plot!(lₖ[1,:], label="DMDc")
+a1 = plot!(bbₖ[1,:], label="DMDc")
 
 a2 = plot(bₖ[3,:], ylabel = L"tr", label="LQR")
-a2 = plot!(lₖ[3,:], label="DMDc")
+a2 = plot!(bbₖ[3,:], label="DMDc")
 
 a3 = plot(x_true2[1,:], ylabel = L"x_{true}", label="LQR")
 a3 = plot!(x_true1[1,:], label="DMDc")

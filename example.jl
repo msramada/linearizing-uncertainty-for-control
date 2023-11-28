@@ -10,7 +10,7 @@ include("./models4example.jl")
 ##### Define Dynamic System Object #####
 dyna = eKF.StateSpaceSys(stateDynamics, outputDynamics, Q, R, Q_true)
 n = dyna.n
-
+liftedDim = 40
 #### Feature vector params #####
 delays =0 # Number of delays in the Hankel-based basis
 order = 2 # Highest degree of multinomial
