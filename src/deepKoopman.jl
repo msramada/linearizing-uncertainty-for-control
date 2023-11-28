@@ -1,7 +1,7 @@
 using Lux, Random, Optimisers, Distributions, Statistics
 
 η = 0.000001
-N_EPOCHS = 10_000
+N_EPOCHS = 2_000
 N_LEAST_SQS = 5_0
 rng = Random.default_rng()
 Random.seed!(rng, 0)
