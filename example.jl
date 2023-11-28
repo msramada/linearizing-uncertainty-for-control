@@ -10,12 +10,12 @@ include("./models4example.jl")
 ##### Define Dynamic System Object #####
 dyna = eKF.StateSpaceSys(stateDynamics, outputDynamics, Q, R, Q_true)
 n = dyna.n
-liftedDim = 40
+liftedDim = 25
 #### Feature vector params #####
 delays =0 # Number of delays in the Hankel-based basis
 order = 2 # Highest degree of multinomial
 make_feature = x -> makeFeature1(x, order, dyna)
-horizon = 10000
+horizon = 10_000
 x_true = zeros(n, horizon+1)
 x_true[:,1] = x₀ + sqrt(dyna.Q_true) * randn(n,)
 U_rec = zeros(1, horizon)
@@ -58,4 +58,4 @@ println("Features data has been collected.")
 
 include("src/DMDc_truncation.jl")
 
-include("src/feedbackSim.jl")
+#include("src/feedbackSim.jl")
