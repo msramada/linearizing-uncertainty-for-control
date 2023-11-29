@@ -55,7 +55,7 @@ end
 
 opt = Optimisers.Adam(η)
 opt_state = Optimisers.setup(opt, params)
-learning_pred_horizon = 8
+learning_pred_horizon = 2
 
 function Train(ps, opt_state, A, B)
 avg_loss = 0.0
