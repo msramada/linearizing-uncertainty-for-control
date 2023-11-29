@@ -1,9 +1,9 @@
 ##### Dynamic System Definition #####
 function observFun1(x)
-	if (x > -1)
-	return 0.2 .* x
+	if (x > -5)
+	return 0.05 .* x
 	else
-	return 0.5 .* x
+	return 0.6 .* x
 	end
 end
 
@@ -46,8 +46,8 @@ elseif systemNumber == 3
 		return observFun1.([1 0] * x)
 	end
 
-	Q = LinearAlgebra.diagm([0.2, 0.1])
-	R = LinearAlgebra.diagm([0.1])
+	Q = LinearAlgebra.diagm([0.3, 0.2])
+	R = LinearAlgebra.diagm([0.2])
 	Q_true = LinearAlgebra.diagm([0.1, 0.0])
 	n = 2
 	x₀ = [randn(); 0.95]
