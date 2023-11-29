@@ -114,5 +114,5 @@ p2 = plot!(PredFeatures1[kk,1:plotting_horizon])
 
 
 
-plot(p1,p2, layout=(2,1), reuse = false)
+display(plot(p1,p2, layout=(2,1), reuse = false))
 savefig("DMDc.png")

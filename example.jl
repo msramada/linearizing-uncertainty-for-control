@@ -4,7 +4,7 @@ include("src/eKF.jl")
 include("src/info_feature_state.jl")
 
 ##### Pick chosen example ######
-systemNumber = 1
+systemNumber = 3
 include("./models4example.jl")
 
 ##### Define Dynamic System Object #####
