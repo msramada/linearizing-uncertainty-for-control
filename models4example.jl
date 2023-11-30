@@ -1,7 +1,7 @@
 ##### Dynamic System Definition #####
 function observFun1(x)
 	if (x > -5)
-	return 0.05 .* x
+	return 0.1 .* x
 	else
 	return 0.6 .* x
 	end

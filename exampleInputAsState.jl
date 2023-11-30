@@ -29,6 +29,7 @@ K_lqr = lqr(Discrete, A, B, I, I)
 #### Chose make_info_state: {1) cholesky: with_cholesky_Σ, 2) trace(QΣ): with_trace_QΣ}
 infoType = "cholesky" # or trace
 l₀ = make_info_state(x₀, Σ₀, dyna, infoType)
+l₀ = [l₀; 0.0]
 NinfoState = length(l₀)
 lₖ = zeros(NinfoState, horizon+1)
 lₖ[:,1] = l₀
@@ -42,6 +43,7 @@ let x₁ = x₀
 let Σ₁ = Σ₀
 	for k in 1:horizon
 		u₀ = sqrt(1.0) * randn(1,) - K_lqr * lₖ[1:1,k]
+		lₖ[end,k] = u₀[1]
 		U_rec[:,k] = u₀
 		x_true[:,k+1] = eKF.next_state_sample(x_true[:,k], u₀, dyna)
 		y_true = eKF.output_sample(x_true[:,k+1], dyna)
@@ -49,11 +51,12 @@ let Σ₁ = Σ₀
 		#xₚ, _ = eKF.time_update(x₁, Σ₁, u₀, dyna)
 		#y_true = dyna.h(xₚ)
 		x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
-		lₖ[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
-		features[:,k+1] = make_feature(lₖ[:,k+1])
+		lₖ[:,k+1] = [make_info_state(x₁, Σ₁, dyna, infoType); 0.0]
+		features[:,k] = make_feature(lₖ[:,k+1])
 	end
 end
 end
+features[:,horizon+1] = make_feature(lₖ[:,horizon+1])
 println("Features data has been collected.")
 
 include("src/DMDc_truncation.jl")
