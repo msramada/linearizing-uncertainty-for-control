@@ -1,9 +1,9 @@
 ##### Dynamic System Definition #####
 function observFun1(x)
-	if (x > -5)
+	if (x > -2)
 	return 0.1 .* x
 	else
-	return 0.6 .* x
+	return 1.5 .* x
 	end
 end
 
@@ -13,7 +13,7 @@ if systemNumber == 1
 	end
 
 	function outputDynamics(x::Vector{Float64})
-		return observFun1.(x)
+		return 0.1 .* tanh.(x .+ 1)
 	end
 	Q = LinearAlgebra.diagm([1])
 	R = LinearAlgebra.diagm([1])
@@ -46,9 +46,9 @@ elseif systemNumber == 3
 		return observFun1.([1 0] * x)
 	end
 
-	Q = LinearAlgebra.diagm([0.3, 0.2])
-	R = LinearAlgebra.diagm([0.2])
-	Q_true = LinearAlgebra.diagm([0.1, 0.0])
+	Q = LinearAlgebra.diagm([0.1, 0.05])
+	R = LinearAlgebra.diagm([0.1])
+	Q_true = LinearAlgebra.diagm([0.05, 0.0])
 	n = 2
 	x₀ = [randn(); 0.95]
 	Σ₀ = LinearAlgebra.diagm(rand(n,))

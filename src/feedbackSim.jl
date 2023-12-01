@@ -24,7 +24,8 @@ let Σ₁ = Σ₀
 	end
 end
 end
-
+println("Experimental cost achieved by NN control: $(LinearAlgebra.tr(bbₖ * bbₖ'))")
+println("Experimental estimation error: $(mean((x_true1 - bbₖ[1:n,:]) .^ 2))")
 
 x_true2 = zeros(n, simHorizon+1)
 bₖ = zeros(NinfoState, simHorizon+1)
@@ -42,7 +43,8 @@ let Σ₁ = Σ₀
 	end
 end
 end
-
+println("Experimental cost achieved by lqr control: $(LinearAlgebra.tr(bₖ * bₖ'))")
+println("Experimental estimation error: $(mean((x_true2 - bₖ[1:n,:]) .^ 2))")
 a1 = plot(bₖ[1,:], ylabel = L"$z_k$", label="LQR")
 a1 = plot!(bbₖ[1,:], label="DMDc")
 

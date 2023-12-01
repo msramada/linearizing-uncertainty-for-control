@@ -1,14 +1,14 @@
 using Lux, Random, Optimisers, Distributions, Statistics
 plotting_horizon = 200
-η = 0.00001
-liftedDim = 32
+η = 0.0001
+liftedDim = 16
 N_EPOCHS = 10_000
 rng = Random.default_rng()
 Random.seed!(rng, 0)
-Nhidden = 128
+Nhidden = 64
 Nencoder = liftedDim
 BATCH_SIZE = 32
-ActivationFunc = tanh
+ActivationFunc = relu
 Φₑ = Chain(
 	Dense(NinfoState, Nhidden, ActivationFunc),
 	Dense(Nhidden, Nhidden, ActivationFunc),
@@ -43,8 +43,8 @@ end
 
 opt = Optimisers.Adam(η)
 opt_state = Optimisers.setup(opt, params)
-learning_pred_horizon = 3
-
+learning_pred_horizon = 4
+LS_N = 1000
 function Train(ps, opt_state, A, B)
 avg_loss = 0.0
 for epoch=1:N_EPOCHS
@@ -65,11 +65,11 @@ if epoch % 1000 == 1
 		" complete ... Loss is $(round(avg_loss, digits=5))")
 	avg_loss = 0.0
 
-	X, _  = Φₑ(TrainingData[:,1:500], ps, ls)
+	X, _  = Φₑ(TrainingData[:,1:LS_N], ps, ls)
 	#X⁺, _ = Φₑ(TrainingData[:,2:end], ps.layer_1, ls.layer_1)
 	X⁺ = X[:,2:end]
 	X = X[:,1:end-1]
-	Γ = X⁺ / [X; U_rec[:,1:500-1]]
+	Γ = X⁺ / [X; U_rec[:,1:LS_N-1]]
 	A = Γ[:,1:liftedDim]
 	B = Γ[:,liftedDim+1:end]
 	xTrunc0 = X[:,1]

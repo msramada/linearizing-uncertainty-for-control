@@ -41,15 +41,16 @@ println("Start simulation ... ")
 let x₁ = x₀
 let Σ₁ = Σ₀
 	for k in 1:horizon
-		u₀ = sqrt(1.0) * randn(1,) * 1 - 1 * K_lqr * lₖ[1:1,k]
+		u₀ = sqrt(5.0) * randn(1,) * 1 - 0 * K_lqr * lₖ[1:1,k]
 		U_rec[:,k] = u₀
 		x_true[:,k+1] = eKF.next_state_sample(x_true[:,k], u₀, dyna)
 		y_true = eKF.output_sample(x_true[:,k+1], dyna)
 		Y_rec[:,k+1] = y_true
-		#xₚ, _ = eKF.time_update(x₁, Σ₁, u₀, dyna)
-		#y_true = dyna.h(xₚ)
+		xₚ, _ = eKF.time_update(x₁, Σ₁, u₀, dyna)
+		y_true = dyna.h(xₚ)
+		Σ₊ = Σ₁
 		x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
-		lₖ[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
+		lₖ[:,k+1] = make_info_state(x₁, Σ₊, dyna, infoType)
 		features[:,k+1] = make_feature(lₖ[:,k+1])
 	end
 end
