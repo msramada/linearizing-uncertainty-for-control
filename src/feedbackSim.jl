@@ -5,7 +5,8 @@ K_lqr = lqr(Discrete, A, B, I, I)
 Q_features_lqr = LinearAlgebra.diagm(zeros(size(SysTruncated1.A)[1],))
 Q_features_lqr[1:NinfoState,1:NinfoState] = I(NinfoState)
 #K₁ = lqr(Discrete, Ā, B̄, Q_features_lqr, I)
-K₁ = lqr(SysTruncated1, Q_features_lqr, I)
+Q_features_lqr = I
+K₁ = lqr(System, Q_features_lqr, I)
 simHorizon = 200
 l₀ = make_info_state(x₀, Σ₀, dyna, infoType)
 x_true1 = zeros(n, simHorizon+1)
@@ -24,7 +25,7 @@ let Σ₁ = Σ₀
 	end
 end
 end
-println("Experimental cost achieved by NN control: $(LinearAlgebra.tr(bbₖ * bbₖ'))")
+println("Experimental cost achieved by eDMD control: $(LinearAlgebra.tr(bbₖ * bbₖ'))")
 println("Experimental estimation error: $(mean((x_true1 - bbₖ[1:n,:]) .^ 2))")
 
 x_true2 = zeros(n, simHorizon+1)

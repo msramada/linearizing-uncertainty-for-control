@@ -62,12 +62,12 @@ B̃ = Û' * X₁ * Ṽ * inv(S̃) * Ũ₂'
 
 xTrunc0 = Û' * S * features[:,1]
 #K₁ * Û' * S * features[:,1]
-SysTruncated1 = ss(Ã, B̃, I, 0, 1)
-TruncatedFeatures1,_ ,_ ,_ = lsim(SysTruncated1,[0 U_rec], x0=xTrunc0)
+System = ss(Ã, B̃, I, 0, 1)
+TruncatedFeatures1,_ ,_ ,_ = lsim(System,[0 U_rec], x0=xTrunc0)
 PredFeatures1 = inv(S) * Û * TruncatedFeatures1
 PredFeatures1 = [PredFeatures1[:,2:end] zero.(PredFeatures1[:,1])]
 PredFeatures1[:,1] = features[:,1]
-#K₁ = lqr(SysTruncated1, I, I)
+#K₁ = lqr(System, I, I)
 
 ######### Carlemann ###############
 Ū, S̄, V̄ = trunc_svd(Ω₂, Truncation2)
