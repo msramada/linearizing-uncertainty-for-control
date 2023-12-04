@@ -11,14 +11,14 @@ ActivationFunc = relu
 Φₑ = Chain(
 	Dense(NinfoState, Nhidden, ActivationFunc),
 	Dense(Nhidden, Nhidden, ActivationFunc),
-	Dense(Nhidden, Nhidden, ActivationFunc),
+#	Dense(Nhidden, Nhidden, ActivationFunc),
 #	Dense(Nhidden, Nhidden, ActivationFunc),
 	Dense(Nhidden, Nencoder)
 	)
 Φd = Chain(
 	Dense(Nencoder, Nhidden, ActivationFunc),
 	Dense(Nhidden, Nhidden, ActivationFunc),
-	Dense(Nhidden, Nhidden, ActivationFunc),
+#	Dense(Nhidden, Nhidden, ActivationFunc),
 #	Dense(Nhidden, Nhidden, ActivationFunc),
 	Dense(Nhidden, NinfoState)
 	)

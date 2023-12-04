@@ -4,7 +4,7 @@ include("src/eKF.jl")
 include("src/info_feature_state.jl")
 
 ##### Pick chosen example ######
-systemNumber = 1
+systemNumber = 2
 include("./models4example.jl")
 
 ##### Define Dynamic System Object #####
@@ -13,7 +13,7 @@ n = dyna.n
 liftedDim = 32
 #### Feature vector params #####
 delays =0 # Number of delays in the Hankel-based basis
-order = 1 # Highest degree of multinomial
+order = 2 # Highest degree of multinomial
 make_feature = x -> makeFeature1(x, order, dyna)
 horizon = 20_000
 x_true = zeros(n, horizon+1)

@@ -58,4 +58,4 @@ a4 = plot!(x_true1[1,:], label="DeepK")
 #a4 = plot(bₖ[2,:], ylabel = L"\theta")
 #a4 = plot!(lₖ[2,:])
 
-display(plot(a1,a2,a3,a4, layout=(4,1), xlabel = L"k"))
+display(plot(a1,a2,a4, layout=(3,1), xlabel = L"k"))
