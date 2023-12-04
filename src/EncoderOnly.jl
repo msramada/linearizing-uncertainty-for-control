@@ -1,18 +1,18 @@
 using Lux, Random, Optimisers, Distributions, Statistics
 plotting_horizon = 200
-η = 0.0001
-liftedDim = 16
-N_EPOCHS = 10_000
+η = 0.001
+liftedDim = 32
+N_EPOCHS = 20_000
 rng = Random.default_rng()
 Random.seed!(rng, 0)
-Nhidden = 64
+Nhidden = 32
 Nencoder = liftedDim
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 ActivationFunc = relu
 Φₑ = Chain(
 	Dense(NinfoState, Nhidden, ActivationFunc),
 	Dense(Nhidden, Nhidden, ActivationFunc),
-#	Dense(Nhidden, Nhidden, ActivationFunc),
+	Dense(Nhidden, Nhidden, ActivationFunc),
 #	Dense(Nhidden, Nhidden, ActivationFunc),
 	Dense(Nhidden, Nencoder)
 	)
@@ -28,7 +28,8 @@ function loss_fn(p, ls, states_list, controls_list, A, B)
 	states = states_list[1]
 	gₓ, _ = Φₑ(states, p, ls)
 	Kgₓ = [A B] * [gₓ;controls_list[1]]
-	OutputMatchingLoss = 1 * mean((states .- gₓ[1:NinfoState,:]) .^2)
+	OutputMatchingLoss = 1 * mean((states_list[2] 
+						.- Kgₓ[1:NinfoState,:]) .^2)
 	gₓ₊, _ = Φₑ(states_list[2], p, ls)	
 	PredictionLoss = 1 * mean((Kgₓ .- gₓ₊) .^2) + 
 					1 * mean((Kgₓ[1:NinfoState,:] .- states_list[2]).^2)
@@ -37,6 +38,8 @@ function loss_fn(p, ls, states_list, controls_list, A, B)
 		gₓ₊, _ = Φₑ(states_list[j+1], p, ls)	
 		PredictionLoss += 1 * mean((Kgₓ .- gₓ₊) .^2) + 
 		1 * mean((Kgₓ[1:NinfoState,:] .- states_list[j+1]).^2)
+		OutputMatchingLoss += 1 * mean((states_list[j+1] 
+						.- Kgₓ[1:NinfoState,:]) .^2)
 	end
 	return PredictionLoss + OutputMatchingLoss
 end

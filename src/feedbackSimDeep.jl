@@ -49,8 +49,8 @@ a1 = plot!(bbₖ[1,:], label="DeepK")
 a2 = plot(bₖ[n+1,:], ylabel = L"tr", label="LQR")
 a2 = plot!(bbₖ[n+1,:], label="DeepK")
 
-a3 = plot(bₖ[n+3,:], ylabel = L"tr", label="LQR")
-a3 = plot!(bbₖ[n+3,:], label="DeepK")
+#a3 = plot(bₖ[n+2,:], ylabel = L"tr", label="LQR")
+#a3 = plot!(bbₖ[n+2,:], label="DeepK")
 
 a4 = plot(x_true2[1,:], ylabel = L"x_{true}", label="LQR")
 a4 = plot!(x_true1[1,:], label="DeepK")
