@@ -92,9 +92,23 @@ for k in 1:horizon
 end
 	return pred_features
 end
-
+xTrunc0 = Û' * S * features[:,1]
 PredFeatures2 = ls_lsim(Ā, B̄, B̄ₓ * Û, [U_rec 0], feature0=xTrunc0)
 PredFeatures2 = inv(S) * Û * PredFeatures2
+PredFeatures2[:,1] = features[:,1]
+
+######### NO INPUT ###############
+B² = zero(features[:,1:1])
+B²[1,1] = 1.0
+Ω₃ = X₁ - B² * U_rec
+
+Ā = Ω₃ / X₀
+Ā = inv(S) * Ā * S
+#B_mat = inv(S) * AB_mat[:,Nfeatures+1:end]
+
+System = ss(Ā, B², I, 0, 1)
+PredFeatures2,_ ,_ ,_ = lsim(System,[U_rec 0], 
+						x0=features[:,1])
 PredFeatures2[:,1] = features[:,1]
 
 ######### Plotting ###############
@@ -103,13 +117,13 @@ start = 50
 kk = 1
 p1 = plot(features[kk,1:plotting_horizon])
 p1 = plot!(PredFeatures1[kk,1:plotting_horizon])
-#p1 = plot!(PredFeatures2[kk,1:plotting_horizon])
+p1 = plot!(PredFeatures2[kk,1:plotting_horizon])
 #p1 = plot!(PPredFeatures1[kk,1:plotting_horizon])
 
 kk = n+1
 p2 = plot(features[kk,1:plotting_horizon])
 p2 = plot!(PredFeatures1[kk,1:plotting_horizon])
-#p2 = plot!(PredFeatures2[kk,1:plotting_horizon])
+p2 = plot!(PredFeatures2[kk,1:plotting_horizon])
 #p2 = plot!(PPredFeatures1[kk,1:plotting_horizon])
 
 

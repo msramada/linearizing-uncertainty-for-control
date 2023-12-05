@@ -1,6 +1,6 @@
 ##### Dynamic System Definition #####
 function observFun1(x)
-	if (x > -0.0)
+	if (x > -0.5)
 	return 0.1 .* x
 	else
 	return 1 .* x
@@ -9,7 +9,7 @@ end
 
 if systemNumber == 1
 	function stateDynamics(x::Vector{Float64}, u::Vector{Float64})
-		return 0.95 * x + u
+		return 0.95 .* x + u
 	end
 
 	function outputDynamics(x::Vector{Float64})

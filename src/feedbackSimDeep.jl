@@ -18,8 +18,9 @@ let Σ₁ = Σ₀
 		x_true1[:,k+1] = eKF.next_state_sample(x_true1[:,k], u₀, dyna)
 		y_true = eKF.output_sample(x_true1[:,k+1], dyna)
 		Y_rec[:,k+1] = y_true
+		Σ₊ = Σ₁
 		x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
-		bbₖ[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
+		bbₖ[:,k+1] = make_info_state(x₁, Σ₊, dyna, infoType)
 	end
 end
 end

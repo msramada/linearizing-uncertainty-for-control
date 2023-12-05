@@ -1,11 +1,11 @@
 using Lux, Random, Optimisers, Distributions, Statistics
 plotting_horizon = 200
-η = 0.001
+η = 1e-4
 liftedDim = 32
 N_EPOCHS = 50_000
 rng = Random.default_rng()
 Random.seed!(rng, 0)
-Nhidden = 32
+Nhidden = 64
 Nencoder = liftedDim
 BATCH_SIZE = 64
 ActivationFunc = relu
@@ -13,7 +13,7 @@ ActivationFunc = relu
 	Dense(NinfoState, Nhidden, ActivationFunc),
 	Dense(Nhidden, Nhidden, ActivationFunc),
 	Dense(Nhidden, Nhidden, ActivationFunc),
-	Dense(Nhidden, Nhidden, relu),
+#	Dense(Nhidden, Nhidden, relu),
 	Dense(Nhidden, Nencoder, identity)
 	)
 
@@ -29,8 +29,8 @@ function loss_fn(p, ls, states_list, controls_list, A, B)
 	gₓ, _ = Φₑ(states, p, ls)
 	Kgₓ = [A B] * [gₓ;controls_list[1]]
 	gₓ₊, _ = Φₑ(states_list[2], p, ls)	
-	PredictionLoss = 1 * mean((Kgₓ .- gₓ₊) .^2) + 
-					1 * mean((Kgₓ[1:NinfoState,:] .- states_list[2]).^2)
+	PredictionLoss = 1 * sum((Kgₓ .- gₓ₊) .^2) + 
+					1 * sum((Kgₓ[1:NinfoState,:] .- states_list[2]).^2)
 	#=
 	for j in 2:pred_horizon-1
 		Kgₓ = [A B] * [Kgₓ;controls_list[j]]
@@ -39,7 +39,7 @@ function loss_fn(p, ls, states_list, controls_list, A, B)
 		1 * mean((Kgₓ[1:NinfoState,:] .- states_list[j+1]).^2)
 	end
 	=#
-	return PredictionLoss
+	return PredictionLoss / pred_horizon
 end
 
 opt = Optimisers.Adam(η)
@@ -57,25 +57,32 @@ for epoch=1:N_EPOCHS
 		push!(states_list, TrainingData[:,indices .+ j])
 		push!(controls_list, U_rec[:,indices .+ j])
 	end
-	Loss = loss_fn(ps, ls, states_list, controls_list, A, B)
-	avg_loss += Loss / N_EPOCHS
-	grad  = Zygote.gradient(p -> loss_fn(p, 
-							ls, states_list, controls_list, A, B), ps)[1]
+	Loss, Back, = Zygote.pullback(p -> loss_fn(p, 
+							ls, states_list, controls_list, A, B), ps)
+	grad, = Back(1.0)
 	opt_state, ps = Optimisers.update(opt_state, ps, grad)
+	avg_loss += Loss / N_EPOCHS
+
 if epoch % 1000 == 0
 	println("$(100 * round(epoch/N_EPOCHS; digits=3))%",
 		" complete ... Loss is $(round(avg_loss, digits=5))")
 	avg_loss = 0.0
-	bb *= 1/2
+	bb *= 0.95
 	opt = Optimisers.Adam(bb)
+	opt_state = Optimisers.setup(opt, ps)
 	X, _  = Φₑ(TrainingData[:,1:LS_N], ps, ls)
+	ScalingVec = sum(X, dims = 2) ./ TrainingHorizon
+	S = inv(LinearAlgebra.Diagonal(ScalingVec[:]))
+	S = I
 	#X⁺, _ = Φₑ(TrainingData[:,2:end], ps.layer_1, ls.layer_1)
 	X⁺ = X[:,2:end]
 	X = X[:,1:end-1]
+	X, X⁺ = S * X, S * X⁺
 	Γ = X⁺ / [X; U_rec[:,1:LS_N-1]]
-	A = Γ[:,1:liftedDim]
-	B = Γ[:,liftedDim+1:end]
-	xTrunc0 = X[:,1]
+	A = 0.9 * A + 0.1 * inv(S) * Γ[:,1:liftedDim] * S
+	B = 0.9 * B + 0.1 * inv(S) * Γ[:,liftedDim+1:end]
+	xTrunc0 = inv(S) * X[:,1]
+	X = inv(S) * X
 	PredFeaturesDeep = ls_lsim(A, B, 0, [U_rec 0], feature0=xTrunc0)
 	a1=plot(TrainingData[1,1:plotting_horizon])
 	a1=plot!(X[1,1:plotting_horizon])
