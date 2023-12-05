@@ -4,7 +4,7 @@ include("src/eKF.jl")
 include("src/info_feature_state.jl")
 
 ##### Pick chosen example ######
-systemNumber = 1
+systemNumber = 5
 include("./models4example.jl")
 
 ##### Define Dynamic System Object #####
@@ -15,7 +15,7 @@ liftedDim = 32
 delays =0 # Number of delays in the Hankel-based basis
 order = 2 # Highest degree of multinomial
 make_feature = x -> makeFeature1(x, order, dyna)
-horizon = 200_000
+horizon = 50_000
 x_true = zeros(n, horizon+1)
 x_true[:,1] = x₀ + sqrt(dyna.Q_true) * randn(n,)
 U_rec = zeros(1, horizon)
@@ -41,7 +41,7 @@ println("Start simulation ... ")
 let x₁ = x₀
 let Σ₁ = Σ₀
 	for k in 1:horizon
-		u₀ = sqrt(5.0) * randn(1,) * 1 - 0 * K_lqr * lₖ[1:1,k]
+		u₀ = sqrt(1.0) * randn(1,) * 1 - 0 * K_lqr * lₖ[1:1,k]
 		U_rec[:,k] = u₀
 		x_true[:,k+1] = eKF.next_state_sample(x_true[:,k], u₀, dyna)
 		y_true = eKF.output_sample(x_true[:,k+1], dyna)
