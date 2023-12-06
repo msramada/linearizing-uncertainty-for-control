@@ -2,10 +2,10 @@ A = [0.95;;]
 B = [1.0;;]
 
 K_lqr = lqr(Discrete, A, B, I, I)
-Q_features_lqr = LinearAlgebra.diagm(zeros(size(SysTruncated1.A)[1],))
+Q_features_lqr = LinearAlgebra.diagm(zeros(size(System.A)[1],))
 Q_features_lqr[1:NinfoState,1:NinfoState] = I(NinfoState)
 #K₁ = lqr(Discrete, Ā, B̄, Q_features_lqr, I)
-Q_features_lqr = I
+#Q_features_lqr = I
 K₁ = lqr(System, Q_features_lqr, I)
 simHorizon = 200
 l₀ = make_info_state(x₀, Σ₀, dyna, infoType)

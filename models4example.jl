@@ -28,7 +28,7 @@ elseif systemNumber == 2
 	end
 
 	function outputDynamics(x::Vector{Float64})
-		return 1/9 .* x .^ 3
+		return 1/27 .* x .^ 3
 	end
 	Q = LinearAlgebra.diagm([0.4])
 	R = LinearAlgebra.diagm([0.2])

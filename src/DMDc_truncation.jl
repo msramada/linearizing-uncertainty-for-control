@@ -106,8 +106,8 @@ Ā = Ω₃ / X₀
 Ā = inv(S) * Ā * S
 #B_mat = inv(S) * AB_mat[:,Nfeatures+1:end]
 
-System = ss(Ā, B², I, 0, 1)
-PredFeatures2,_ ,_ ,_ = lsim(System,[U_rec 0], 
+System1 = ss(Ā, B², I, 0, 1)
+PredFeatures2,_ ,_ ,_ = lsim(System1,[U_rec 0], 
 						x0=features[:,1])
 PredFeatures2[:,1] = features[:,1]
 
@@ -129,4 +129,4 @@ p2 = plot!(PredFeatures2[kk,1:plotting_horizon])
 
 
 display(plot(p1,p2, layout=(2,1), reuse = false))
-#savefig("DMDc.png")
+savefig("figs/DMDc.png")

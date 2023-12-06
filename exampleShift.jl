@@ -13,7 +13,7 @@ n = dyna.n
 liftedDim = 32
 #### Feature vector params #####
 delays =0 # Number of delays in the Hankel-based basis
-order = 2 # Highest degree of multinomial
+order = 1 # Highest degree of multinomial
 make_feature = x -> makeFeature1(x, order, dyna)
 horizon = 50_000
 x_true = zeros(n, horizon+1)
