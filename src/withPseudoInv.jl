@@ -28,5 +28,6 @@ p2 = plot!(pred_features[kk,1:plotting_horizon])
 #p2 = plot!(PPredFeatures1[kk,1:plotting_horizon])
 
 
-savefig("figs/pseudo.png")
+
 display(plot(p1,p2, layout=(2,1), reuse = false))
+savefig("figs/pseudo.png")

@@ -74,7 +74,7 @@ if epoch % 1000 == 0
 	X = [TrainingData[:,1:LS_N]; Φₑ(TrainingData[:,1:LS_N], ps, ls)[1]]
 	ScalingVec = sum(X, dims = 2) ./ TrainingHorizon
 	S = inv(LinearAlgebra.Diagonal(ScalingVec[:]))
-	S = I
+	#S = I
 	#X⁺, _ = Φₑ(TrainingData[:,2:end], ps.layer_1, ls.layer_1)
 	X⁺ = X[:,2:end]
 	X = X[:,1:end-1]

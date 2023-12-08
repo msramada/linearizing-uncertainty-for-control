@@ -1,9 +1,9 @@
 ##### Dynamic System Definition #####
 function observFun1(x)
 	if (x > -0.0)
-	return 0.1 .* x
-	else
 	return 0.5 .* x
+	else
+	return 0.9 .* x
 	end
 end
 
@@ -24,20 +24,34 @@ if systemNumber == 1
 
 elseif systemNumber == 2
 	function stateDynamics(x::Vector{Float64}, u::Vector{Float64})
+		return 0.95 * observFun1.(0.1 * x) + u
+	end
+
+	function outputDynamics(x::Vector{Float64})
+		return sqrt.(abs.(x)) .* sign.(x)
+	end
+	Q = LinearAlgebra.diagm([0.2])
+	R = LinearAlgebra.diagm([0.2])
+	Q_true = 0.2 * Q
+	n = 1
+	x₀ = randn(n,)
+	Σ₀ = LinearAlgebra.diagm(rand(n,))
+elseif systemNumber == 3
+	function stateDynamics(x::Vector{Float64}, u::Vector{Float64})
 		return 0.95 * x + u
 	end
 
 	function outputDynamics(x::Vector{Float64})
 		return sqrt.(abs.(x)) .* sign.(x)
 	end
-	Q = LinearAlgebra.diagm([0.5])
-	R = LinearAlgebra.diagm([0.5])
+	Q = LinearAlgebra.diagm([0.2])
+	R = LinearAlgebra.diagm([0.1])
 	Q_true = 0.2 * Q
 	n = 1
 	x₀ = randn(n,)
 	Σ₀ = LinearAlgebra.diagm(rand(n,))
 
-elseif systemNumber == 3
+elseif systemNumber == 4
 	function stateDynamics(x::Vector{Float64}, u::Vector{Float64})
 		return [x[1] * x[2] + u[1]; x[2]]
 	end
@@ -53,7 +67,7 @@ elseif systemNumber == 3
 	x₀ = [randn(); 0.95]
 	Σ₀ = LinearAlgebra.diagm(rand(n,))
 
-elseif systemNumber == 4
+elseif systemNumber == 5
 	function stateDynamics(x::Vector{Float64}, u::Vector{Float64})
 		v1 = 2 * sin(x[1]) + (5 + cos(x[1])) * u[1]
 		v2 = -2 * cos(u[1]) * x[1] / (1 + x[1] ^ 2)
@@ -71,7 +85,7 @@ elseif systemNumber == 4
 	x₀ = [randn(); 0.95]
 	Σ₀ = LinearAlgebra.diagm(rand(n,))
 
-elseif systemNumber == 5
+elseif systemNumber == 6
 	function stateDynamics(x::Vector{Float64}, u::Vector{Float64})
 		return [x[1] * x[2] + x[3] * u[1]; x[2]; x[3]]
 	end

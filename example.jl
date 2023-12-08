@@ -10,12 +10,12 @@ include("./models4example.jl")
 ##### Define Dynamic System Object #####
 dyna = eKF.StateSpaceSys(stateDynamics, outputDynamics, Q, R, Q_true)
 n = dyna.n
-liftedDim = 128
+liftedDim = 64
 #### Feature vector params #####
 delays = 0 # Number of delays in the Hankel-based basis
-order = 3 # Highest degree of multinomial
+order = 2 # Highest degree of multinomial
 make_feature = x -> makeFeature1(x, order, dyna)
-horizon = 1_000
+horizon = 5_000
 x_true = zeros(n, horizon+1)
 x_true[:,1] = x₀ + sqrt(dyna.Q_true) * randn(n,)
 A = [0.95;;]
@@ -52,7 +52,7 @@ function sim2learn_eKF(x₀::Vector{Float64}, Σ₀::Matrix, U_rec)
 	return lₖ, features, Nfeatures, NinfoState
 end
 
-U_rec = 5 * randn(1, horizon)
+U_rec = 2 * randn(1, horizon)
 lₖ, features, Nfeatures, NinfoState = sim2learn_eKF(x₀, Σ₀, U_rec)
 println("Features data has been collected.")
 
