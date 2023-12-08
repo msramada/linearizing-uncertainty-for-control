@@ -30,8 +30,8 @@ elseif systemNumber == 2
 	function outputDynamics(x::Vector{Float64})
 		return sqrt.(abs.(x)) .* sign.(x)
 	end
-	Q = LinearAlgebra.diagm([0.4])
-	R = LinearAlgebra.diagm([0.2])
+	Q = LinearAlgebra.diagm([0.5])
+	R = LinearAlgebra.diagm([0.5])
 	Q_true = 0.2 * Q
 	n = 1
 	x₀ = randn(n,)
