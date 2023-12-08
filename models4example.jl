@@ -28,7 +28,7 @@ elseif systemNumber == 2
 	end
 
 	function outputDynamics(x::Vector{Float64})
-		return 1/27 .* x .^ 3
+		return sqrt.(abs.(x)) .* sign.(x)
 	end
 	Q = LinearAlgebra.diagm([0.4])
 	R = LinearAlgebra.diagm([0.2])
@@ -77,7 +77,7 @@ elseif systemNumber == 5
 	end
 
 	function outputDynamics(x::Vector{Float64})
-		return observFun1.([1 0 0] * x)
+		return sqrt.(abs.([1 0 0] * x)) .* sign.([1 0 0] * x)
 	end
 
 	Q = LinearAlgebra.diagm([0.3, 0.1, 0.1])

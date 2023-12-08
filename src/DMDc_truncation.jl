@@ -3,6 +3,7 @@ ScalingVec = sum(X₀, dims = 2) ./ horizon
 ScalingVec[1:NinfoState] .*= 1/2
 #ScalingVec[1:n+1] ./= 2
 S = inv(LinearAlgebra.Diagonal(ScalingVec[:]))
+S = I
 X₀, X₁ = S * X₀, S * X₁
 
 XX = features[:,delays+1:end]
@@ -22,8 +23,8 @@ XX₁ = SS * XX₁
 numberOfstates = liftedDim
 reduction = 1 - numberOfstates / Nfeatures
 Truncation = floor(Int, Nfeatures * (1-reduction))
-Truncation1 = floor(Int, 2 * Truncation)#Truncation + floor(Int, reduction * Truncation)
-Truncation2 = 2 * Truncation
+Truncation1 = floor(Int, 1.1 * Truncation)#Truncation + floor(Int, reduction * Truncation)
+Truncation2 = 1 * Truncation
 function trunc_svd(Mat, trunc)
 	U, s, V = svd(Mat)
 	U = U[:,1:trunc]
@@ -93,9 +94,9 @@ end
 	return pred_features
 end
 xTrunc0 = Û' * S * features[:,1]
-PredFeatures2 = ls_lsim(Ā, B̄, B̄ₓ * Û, [U_rec 0], feature0=xTrunc0)
-PredFeatures2 = inv(S) * Û * PredFeatures2
-PredFeatures2[:,1] = features[:,1]
+PredFeatures3 = ls_lsim(Ā, B̄, B̄ₓ * Û, [U_rec 0], feature0=xTrunc0)
+PredFeatures3 = inv(S) * Û * PredFeatures3
+PredFeatures3[:,1] = features[:,1]
 
 ######### NO INPUT ###############
 B² = zero(features[:,1:1])
@@ -117,16 +118,14 @@ start = 50
 kk = 1
 p1 = plot(features[kk,1:plotting_horizon])
 p1 = plot!(PredFeatures1[kk,1:plotting_horizon])
-p1 = plot!(PredFeatures2[kk,1:plotting_horizon])
-#p1 = plot!(PPredFeatures1[kk,1:plotting_horizon])
+#p1 = plot!(PredFeatures2[kk,1:plotting_horizon])
+#p1 = plot!(PredFeatures3[kk,1:plotting_horizon])
 
 kk = n+1
 p2 = plot(features[kk,1:plotting_horizon])
 p2 = plot!(PredFeatures1[kk,1:plotting_horizon])
-p2 = plot!(PredFeatures2[kk,1:plotting_horizon])
-#p2 = plot!(PPredFeatures1[kk,1:plotting_horizon])
+#p2 = plot!(PredFeatures2[kk,1:plotting_horizon])
+#p2 = plot!(PredFeatures3[kk,1:plotting_horizon])
 
-
-
-display(plot(p1,p2, layout=(2,1), reuse = false))
 savefig("figs/DMDc.png")
+display(plot(p1,p2, layout=(2,1), reuse = false))

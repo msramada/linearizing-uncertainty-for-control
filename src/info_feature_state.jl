@@ -6,13 +6,9 @@ function make_info_state(x::Vector{Float64}, Σ::Matrix{Float64}, DynamicSysObj,
 	elseif infoType == "cholesky"
 		n = size(DynamicSysObj.Q)[1]
 		l = zeros(int((n^2+n)/2),)
-		Σ = Symmetric(Σ)# + 0.1 * I)
+		Σ = Symmetric(Σ)
 		L = cholesky(Σ).L
-		#L = Σ
-		for i in 1:n
-			l[int((i^2-i)/2+1):int((i^2+i)/2)] = L[i,1:i]
-		end
-		#l = log.(l)
+		l = 1.0 * half_vectorize(Matrix(L))
 		return [x;l]
 	end
 end
@@ -21,13 +17,17 @@ function back_from_cholesky_Σ(l::Vector{Float64}, DynamicSysObj)
 	n = size(DynamicSysObj.Q)[1]
 	L = zeros(n, n)
 	x = l[1:n]
-	#x = exp.(x)
 	vect = l[n+1:end]
-	for i in 1:n
-		L[i,1:i] = vect[int((i^2-i)/2+1):int((i^2+i)/2)]
+	counter = 0
+	for j in 1:n
+		for i in 1:n
+			if j<=i
+				counter += 1
+				L[i,j] = vect[counter]
+			end
+		end
 	end
 	Σ = L * L'
-	#Σ = (L + L') .- LinearAlgebra.diagm(LinearAlgebra.diag(L))
 	return x, Σ
 end
 
@@ -39,7 +39,7 @@ function vector_infoState_update(π₀::Vector{Float64}, u₀::Vector{Float64}, 
 end
 
 
-function vectorize(A::Matrix)
+function half_vectorize(A::Matrix)
 	n, m = size(A)
 	l = []
 	for j in 1:m
@@ -52,16 +52,29 @@ function vectorize(A::Matrix)
 	return l
 end
 
+function vectorize_all(A::Matrix)
+	n, m = size(A)
+	l = []
+	for j in 1:m
+		for i in 1:n
+				l = [l; A[i,j]]
+		end
+	end
+	return l
+end
+
 function makeFeature1(l::Vector{Float64}, order::Int, DynamicSysObj)
 	return [makeFeature_Polys(l, order, DynamicSysObj);
-		makeFeature_Obs(l, order, DynamicSysObj); 1.0]
+		makeFeature_Obs(l, order, DynamicSysObj)]
 end
 function makeFeature_Polys(l::Vector{Float64}, order::Int, DynamicSysObj) # returns a vector of length # * (nn²+nn)/2 + nn
+	l = [1.0; l]
 	lₚ = l
 	for i in 1:order
-		lₚ = vectorize(lₚ * l')
+		lₚ = half_vectorize(lₚ * l')
 	end
-	return [l; lₚ; 1.0]
+	lₚ = [lₚ[2:end];lₚ[1]]
+	return lₚ
 end
 
 function makeFeature_Obs(l::Vector{Float64}, order::Int, DynamicSysObj) # returns a vector of length # * (nn²+nn)/2 + nn
@@ -69,7 +82,7 @@ function makeFeature_Obs(l::Vector{Float64}, order::Int, DynamicSysObj) # return
 	g = [1.0; g]
 	lₚ = g
 	for i in 1:order+6
-		lₚ = vectorize(lₚ * g')
+		lₚ = half_vectorize(lₚ * g')
 	end
-	return lₚ
+	return lₚ[2:end]
 end

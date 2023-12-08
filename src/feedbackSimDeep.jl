@@ -6,7 +6,7 @@ Q_features_lqr = zero.(Ann)
 Q_features_lqr[1:NinfoState,1:NinfoState] = I(NinfoState)
 #K₁ = lqr(Discrete, Ā, B̄, Q_features_lqr, I)
 K₁ = lqr(Discrete, Ann, Bnn, Q_features_lqr, I)
-simHorizon = 300
+simHorizon = 600
 x_true1 = zeros(n, simHorizon+1)
 bbₖ = zeros(NinfoState, simHorizon+1)
 bbₖ[:,1] = lₖ[:,1]
@@ -63,8 +63,9 @@ title = "Costs: LQR: $costLQR, DeepK: $costDeep. Mean estim. errors: $estimErrLQ
 #a4 = plot(bₖ[2,:], ylabel = L"\theta")
 #a4 = plot!(lₖ[2,:])
 
+savefig("figs/feedbackSimDeep.png")
 display(plot(a1,a2,a4, layout=(3,1), xlabel = L"k"))
-savefig("figs/feedbackSim.png")
+
 
 
 #=

@@ -1,8 +1,8 @@
 using Lux, Random, Optimisers, Distributions, Statistics
 plotting_horizon = 200
 η = 1e-3
-liftedDim = 32
-N_EPOCHS = 50_000
+liftedDim = Nfeatures
+N_EPOCHS = 5_000
 rng = Random.default_rng()
 Random.seed!(rng, 0)
 Nhidden = 32
@@ -19,10 +19,44 @@ ActivationFunc = relu
 function encoder_concat(Encoder_NN, state, p, ls)
 	return [state; Encoder_NN(state, p, ls)[1]]
 end
-
 params, ls = Lux.setup(rng, Φₑ)
 TrainingHorizon = floor(Int, size(lₖ)[2]/1.2)
 TrainingData = lₖ[:,1:TrainingHorizon]
+
+function loss_warmup(X, p, ls)
+	Xₑ = Φₑ(X, p, ls)[1]
+	X_dot = [X[:,i] for i in 1:size(X)[2]]
+
+	feach = make_feature.(X_dot)
+
+	Matfeach = reduce(hcat, feach)
+	println(Matfeach)
+	loss = 1 * mean((Matfeach - [X; Xₑ]) .^ 2)
+	return loss
+end
+
+function warm_up(ps, ls, TrainingData)
+opt = Optimisers.Adam(η)
+opt_state = Optimisers.setup(opt, ps)	
+avg_loss = 0.0
+	for epoch in 1:200
+		indices = rand(1:TrainingHorizon, BATCH_SIZE)
+		X = TrainingData[:,indices]	
+		Loss, Back, = Zygote.pullback(p -> loss_warmup(X, p, ls), ps)
+		grad, = Back(1.0)
+		opt_state, ps = Optimisers.update(opt_state, ps, grad)
+		avg_loss += Loss / N_EPOCHS
+		if epoch % 20 == 0
+			println("Warm-up learning $(100 * round(epoch/200; digits=3))%",
+				", loss is $avg_loss")
+			avg_loss = 0.0
+		end
+		
+	end
+	return ps
+end
+
+
 ValidationData = lₖ[:,TrainingHorizon+1:end]
 A = randn(liftedDim, liftedDim)
 B = randn(liftedDim, 1)
@@ -32,24 +66,24 @@ function loss_fn(p, ls, states_list, controls_list, A, B)
 	gₓ = encoder_concat(Φₑ, states_list[1], p, ls)
 	Kgₓ = [A B] * [gₓ; controls_list[1]]
 	gₓ₊ = encoder_concat(Φₑ, states_list[2], p, ls)
-	PredictionLoss = 1 * mean((Kgₓ .- gₓ₊) .^ 2)
+	PredictionLoss = 1 * sum((Kgₓ .- gₓ₊) .^ 2)
 	for j in 2:pred_horizon-1
 		Kgₓ = [A B] * [Kgₓ;controls_list[j]]
 		gₓ₊ = encoder_concat(Φₑ, states_list[j+1], p, ls)
-		PredictionLoss += 1 * mean((Kgₓ .- gₓ₊) .^ 2)
+		PredictionLoss += 1 * sum((Kgₓ .- gₓ₊) .^ 2)
 	end
-	return PredictionLoss / pred_horizon
+	return PredictionLoss
 end
 
 opt = Optimisers.Adam(η)
 opt_state = Optimisers.setup(opt, params)
 learning_pred_horizon = 3
-LS_N = 2000
+LS_N = 500
 
 function Train(ps, opt_state, A, B)
 avg_loss = 0.0
 bb = η
-for epoch=1:N_EPOCHS
+for epoch in 1:N_EPOCHS
 	indices = rand(1:TrainingHorizon - learning_pred_horizon, BATCH_SIZE)
 	states_list = []
 	controls_list = []
@@ -63,15 +97,15 @@ for epoch=1:N_EPOCHS
 	opt_state, ps = Optimisers.update(opt_state, ps, grad)
 	avg_loss += Loss / N_EPOCHS
 
-if epoch % 1000 == 0
+if epoch % 100 == 1
 	println("$(100 * round(epoch/N_EPOCHS; digits=3))%",
 		" complete ... Loss is $(round(avg_loss, digits=5))")
 	avg_loss = 0.0
 	#bb *= 0.97
 	#opt = Optimisers.Adam(bb)
 	#opt_state = Optimisers.setup(opt, ps)
-	#X = encoder_concat(Φₑ, TrainingData[:,1:LS_N], ps, ls)
-	X = [TrainingData[:,1:LS_N]; Φₑ(TrainingData[:,1:LS_N], ps, ls)[1]]
+	X = encoder_concat(Φₑ, TrainingData[:,1:LS_N], ps, ls)
+	#X = [TrainingData[:,1:LS_N]; Φₑ(TrainingData[:,1:LS_N], ps, ls)[1]]
 	ScalingVec = sum(X, dims = 2) ./ TrainingHorizon
 	S = inv(LinearAlgebra.Diagonal(ScalingVec[:]))
 	S = I
@@ -98,6 +132,7 @@ end
 return ps, A, B
 end
 
+params = warm_up(params, ls, TrainingData)
 ps, Ann, Bnn = Train(params, opt_state, A, B)
 
 println("Learning has been done!")
