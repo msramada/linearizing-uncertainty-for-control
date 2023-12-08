@@ -4,7 +4,7 @@ include("src/eKF.jl")
 include("src/info_feature_state.jl")
 
 ##### Pick chosen example ######
-systemNumber = 2
+systemNumber = 6
 include("./models4example.jl")
 
 ##### Define Dynamic System Object #####
@@ -12,7 +12,7 @@ dyna = eKF.StateSpaceSys(stateDynamics, outputDynamics, Q, R, Q_true)
 n = dyna.n
 liftedDim = 64
 #### Feature vector params #####
-delays = 0 # Number of delays in the Hankel-based basis
+delays = 2 # Number of delays in the Hankel-based basis
 order = 2 # Highest degree of multinomial
 make_feature = x -> makeFeature1(x, order, dyna)
 horizon = 5_000
