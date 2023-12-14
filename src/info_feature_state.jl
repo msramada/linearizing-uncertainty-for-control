@@ -77,6 +77,16 @@ function makeFeature_Polys(l::Vector{Float64}, order::Int, DynamicSysObj) # retu
 	return lₚ
 end
 
+function makeFeature_Trigon(l::Vector{Float64}, order::Int, DynamicSysObj) # returns a vector of length # * (nn²+nn)/2 + nn
+	ω = 0.1:0.1:2
+	lₚ = l
+	for i in 1:length(ω)
+		lₚ = [lₚ; sin.(ω[i] .* l); cos.(ω[i] .* l)]
+	end
+	lₚ = [lₚ; 1.0]
+	return lₚ
+end
+
 function makeFeature_Obs(l::Vector{Float64}, order::Int, DynamicSysObj) # returns a vector of length # * (nn²+nn)/2 + nn
 	g = DynamicSysObj.h(l[1:DynamicSysObj.n])
 	g = [1.0; g]

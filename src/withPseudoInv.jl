@@ -12,7 +12,7 @@ B_mat = inv(S) * AB_mat[:,Nfeatures+1:end]
 
 System = ss(A_mat, B_mat, I, 0, 1)
 pred_features,_ ,_ ,_ = lsim(System, U_rec, x0=features[:,1])
-
+Û = I
 ######### Plotting ###############
 plotting_horizon = 300
 kk = 1
@@ -31,3 +31,4 @@ p2 = plot!(pred_features[kk,1:plotting_horizon])
 
 display(plot(p1,p2, layout=(2,1), reuse = false))
 savefig("figs/pseudo.png")
+display(plot(p1,p2, layout=(2,1), reuse = false))

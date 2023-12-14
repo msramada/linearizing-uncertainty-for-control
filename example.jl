@@ -4,17 +4,18 @@ include("src/eKF.jl")
 include("src/info_feature_state.jl")
 
 ##### Pick chosen example ######
-systemNumber = 6
+systemNumber = 1
 include("./models4example.jl")
 
 ##### Define Dynamic System Object #####
 dyna = eKF.StateSpaceSys(stateDynamics, outputDynamics, Q, R, Q_true)
 n = dyna.n
-liftedDim = 64
+liftedDim = 4
 #### Feature vector params #####
 delays = 2 # Number of delays in the Hankel-based basis
-order = 2 # Highest degree of multinomial
-make_feature = x -> makeFeature1(x, order, dyna)
+order = 1 # Highest degree of multinomial
+make_feature = x -> makeFeature_Trigon(x, order, dyna)
+make_feature = x -> [x;1.0]
 horizon = 5_000
 x_true = zeros(n, horizon+1)
 x_true[:,1] = x₀ + sqrt(dyna.Q_true) * randn(n,)
@@ -41,7 +42,7 @@ function sim2learn_eKF(x₀::Vector{Float64}, Σ₀::Matrix, U_rec)
 	for k in 1:horizon
 		u₀ = U_rec[:,k]
 		x_true[:,k+1] = eKF.next_state_sample(x_true[:,k], u₀, dyna)
-		#y_true = eKF.output_sample(x_true[:,k+1], dyna)
+		y_true = eKF.output_sample(x_true[:,k+1], dyna)
 		xₚ, _ = eKF.time_update(x₁, Σ₁, u₀, dyna)
 		y_true = dyna.h(xₚ)
 		Σ₊ = Σ₁
@@ -52,10 +53,10 @@ function sim2learn_eKF(x₀::Vector{Float64}, Σ₀::Matrix, U_rec)
 	return lₖ, features, Nfeatures, NinfoState
 end
 
-U_rec = 2 * randn(1, horizon)
+U_rec = 0.2 * randn(1, horizon)
 lₖ, features, Nfeatures, NinfoState = sim2learn_eKF(x₀, Σ₀, U_rec)
 println("Features data has been collected.")
 
-include("src/DMDc_truncation.jl")
-
+#include("src/DMDc_truncation.jl")
+include("src/withPseudoInv.jl")
 #include("src/feedbackSim.jl")

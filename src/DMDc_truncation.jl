@@ -105,13 +105,13 @@ kk = 1
 p1 = plot(features[kk,1:plotting_horizon])
 p1 = plot!(PredFeatures1[kk,1:plotting_horizon])
 p1 = plot!(PredFeatures3[kk,1:plotting_horizon])
-p1 = plot!(PPredFeatures1[kk,1:plotting_horizon])
+#p1 = plot!(PPredFeatures1[kk,1:plotting_horizon])
 
 kk = n+1
 p2 = plot(features[kk,1:plotting_horizon])
 p2 = plot!(PredFeatures1[kk,1:plotting_horizon])
 p2 = plot!(PredFeatures3[kk,1:plotting_horizon])
-p2 = plot!(PPredFeatures1[kk,1:plotting_horizon])
+#p2 = plot!(PPredFeatures1[kk,1:plotting_horizon])
 
 plot(p1,p2, layout=(2,1), reuse = false)
 savefig("figs/DMDc.png")

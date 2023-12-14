@@ -1,23 +1,24 @@
+using Lux
 ##### Dynamic System Definition #####
 function observFun1(x)
-	if (x > -0.0)
-	return 0.5 .* x
+	if (x < 0.0)
+	return 0.1 .* x
 	else
-	return 0.9 .* x
+	return 0.5 .* x
 	end
 end
-
+# Stochastic uniformly dissipative systems
 if systemNumber == 1
 	function stateDynamics(x::Vector{Float64}, u::Vector{Float64})
-		return 0.95 .* x + u
+		return 0.92 .* x + u
 	end
 
 	function outputDynamics(x::Vector{Float64})
-		return observFun1.(x)
+		return elu.(3.0 .* (x .- 1.0))
 	end
 	Q = LinearAlgebra.diagm([0.2])
 	R = LinearAlgebra.diagm([0.1])
-	Q_true = 0.2 * Q
+	Q_true = 0.5 * Q
 	n = 1
 	x₀ = randn(n,)
 	Σ₀ = LinearAlgebra.diagm(rand(n,))
@@ -46,7 +47,7 @@ elseif systemNumber == 3
 	end
 	Q = LinearAlgebra.diagm([0.2])
 	R = LinearAlgebra.diagm([0.1])
-	Q_true = 0.2 * Q
+	Q_true = 0.5 * Q
 	n = 1
 	x₀ = randn(n,)
 	Σ₀ = LinearAlgebra.diagm(rand(n,))
@@ -91,7 +92,7 @@ elseif systemNumber == 6
 	end
 
 	function outputDynamics(x::Vector{Float64})
-		return sqrt.(abs.([1 0 0] * x)) .* sign.([1 0 0] * x)
+		return observFun1.([1 0 0] * x)
 	end
 
 	Q = LinearAlgebra.diagm([0.3, 0.1, 0.1])
