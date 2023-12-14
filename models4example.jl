@@ -27,11 +27,11 @@ if systemNumber == 1
 
 elseif systemNumber == 2
 	function stateDynamics(x::Vector{Float64}, u::Vector{Float64})
-		return α * observFun1.(0.1 * x) + u
+		return x + u
 	end
 
 	function outputDynamics(x::Vector{Float64})
-		return sqrt.(abs.(x)) .* sign.(x)
+		return 1/27 .* x .^ 3
 	end
 	Q = LinearAlgebra.diagm([0.2])
 	R = LinearAlgebra.diagm([0.2])

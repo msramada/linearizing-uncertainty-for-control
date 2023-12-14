@@ -60,15 +60,20 @@ p2 = plot(features[2n+1,1:200])
 p2 = plot!(learnt_features[2n+1,1:200])
 plot(p1,p2, layout=(2,1))
 savefig("figs/learning_result.png")
-simHorizon = 500
+simHorizon = 1000
 x_DMD, x_lqr, Qₛₛ, x_true1, x_true2 = simulate_system(System, simHorizon, x₀, Σ₀)
 Qₛₛ = Qₛₛ[1:end-1,1:end-1]
-println("Experimental cost achieved by lqr control: $(LinearAlgebra.tr(Qₛₛ * x_lqr * x_lqr'))")
-println("Experimental estimation error: $(mean((x_true2 - x_lqr[1:n,:]) .^ 2))")
 
-println("Experimental cost achieved by eDMD control: $(LinearAlgebra.tr(Qₛₛ * x_DMD * x_DMD'))")
-println("Experimental estimation error: $(mean((x_true1 - x_DMD[1:n,:]) .^ 2))")
+Result_cost1 = "Experimental cost achieved by lqr control: $(LinearAlgebra.tr(Qₛₛ * x_lqr * x_lqr'))"
+Result_cost2 = "Experimental estimation error: $(mean((x_true2 - x_lqr[1:n,:]) .^ 2))"
 
+Result_est_err1 = "Experimental cost achieved by eDMD control: $(LinearAlgebra.tr(Qₛₛ * x_DMD * x_DMD'))"
+Result_est_err2 = "Experimental estimation error: $(mean((x_true1 - x_DMD[1:n,:]) .^ 2))"
+
+print(Result_cost1,"\n",Result_cost2,"\n",Result_est_err1,"\n",Result_est_err2)
+open("figs/paper_figs/results.txt", "w") do file
+	println(file, Result_cost1,"\n",Result_cost2,"\n",Result_est_err1,"\n",Result_est_err2)
+end
 
 a1 = plot(x_lqr[1,:], ylabel = L"$z_k$", label="LQR")
 a1 = plot!(x_DMD[1,:], label="DMDc")
@@ -82,3 +87,6 @@ a3 = plot!(x_true1[1,:], label="DMDc")
 
 plot(a1,a2,a3, layout=(3,1))
 savefig("figs/feedbackSim.png")
+
+
+include("plotting_paper.jl")
