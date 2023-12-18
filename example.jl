@@ -4,7 +4,7 @@ include("src/eKF.jl")
 include("src/info_feature_state.jl")
 
 ##### Pick chosen example ######
-systemNumber = 1
+systemNumber = 2
 include("./models4example.jl")
 
 ##### Define Dynamic System Object #####
@@ -13,7 +13,7 @@ n = dyna.n
 #### Feature vector params #####
 order = 1 # Highest degree of multinomial
 make_feature = x -> [x;1.0]
-horizon = 10_000
+horizon = 5_000
 x_true = zeros(n, horizon+1)
 x_true[:,1] = x₀ + sqrt(dyna.Q_true) * randn(n,)
 #### Chose make_info_state: {1) cholesky: with_cholesky_Σ, 2) trace(QΣ): with_trace_QΣ}
@@ -66,11 +66,12 @@ Result_est_err1 = "Experimental cost achieved by eDMD control: $(LinearAlgebra.t
 Result_est_err2 = "Experimental estimation error: $(mean((x_true1 - x_DMD[1:n,:]) .^ 2))"
 
 print(Result_cost1,"\n",Result_cost2,"\n",Result_est_err1,"\n",Result_est_err2)
-open("figs/paper_figs/results.txt", "w") do file
-	println(file, Result_cost1,"\n",Result_cost2,"\n",Result_est_err1,"\n",Result_est_err2)
+open("results/results.txt", "w") do file
+	println(file, Result_cost1,"\n",
+	Result_cost2,"\n",Result_est_err1,"\n",Result_est_err2)
 end
 
 
-FileIO.save("ExampleData.jld2", "x_lqr", x_lqr, "x_DMD", x_DMD, "n", n, 
+FileIO.save("results/ExampleData.jld2", "x_lqr", x_lqr, "x_DMD", x_DMD, "n", n, 
 			"features", features, "learnt_features", learnt_features)
 include("plotting_paper.jl")

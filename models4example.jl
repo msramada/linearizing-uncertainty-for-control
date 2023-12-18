@@ -1,7 +1,5 @@
 using Lux
 ##### Dynamic System Definition #####
-α = 0.92
-β = 1.0
 function observFun1(x)
 	if (x < 0.0)
 	return 0.1 .* x
@@ -11,8 +9,10 @@ function observFun1(x)
 end
 # Stochastic uniformly dissipative systems
 if systemNumber == 1
+	A_true = [1;;]
+	B_true = [1;;]
 	function stateDynamics(x::Vector{Float64}, u::Vector{Float64})
-		return α .* x + β .* u
+		return A_true * x + B_true * u
 	end
 
 	function outputDynamics(x::Vector{Float64})
@@ -26,17 +26,20 @@ if systemNumber == 1
 	Σ₀ = LinearAlgebra.diagm(rand(n,))
 
 elseif systemNumber == 2
+	
+	A_true = [0.9 0.5;0 0.92]
+	B_true = [0;1.0;;]
 	function stateDynamics(x::Vector{Float64}, u::Vector{Float64})
-		return x + u
+		return A_true * x + B_true * u
 	end
 
 	function outputDynamics(x::Vector{Float64})
-		return 1/27 .* x .^ 3
+		return [elu.( 1.0 * (1.0 .*(x[1] + x[2]) .- 3.0))]
 	end
-	Q = LinearAlgebra.diagm([0.2])
+	Q = LinearAlgebra.diagm([0.2,0.2])
 	R = LinearAlgebra.diagm([0.2])
-	Q_true = 0.2 * Q
-	n = 1
+	Q_true = 1.0 * Q
+	n = 2
 	x₀ = randn(n,)
 	Σ₀ = LinearAlgebra.diagm(rand(n,))
 elseif systemNumber == 3

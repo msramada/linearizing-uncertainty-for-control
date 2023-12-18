@@ -1,0 +1,4 @@
+Experimental cost achieved by lqr control: 6842.505171036721
+Experimental estimation error: 6.618391857808027
+Experimental cost achieved by eDMD control: 3988.9873688677685
+Experimental estimation error: 3.1974695153070174

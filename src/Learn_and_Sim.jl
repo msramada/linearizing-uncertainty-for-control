@@ -22,12 +22,11 @@ end
 
 function simulate_system(System, simHorizon::Int, x₀, Σ₀)
     
-A = [α;;]
-B = [β;;]
-K_lqr = lqr(Discrete, A, B, I, I)
+
+K_lqr = lqr(Discrete, A_true, B_true, I, I)
 
 Qₛₛ = zero(System.A)
-Qₛₛ[n+1:n+NinfoState,n+1:n+NinfoState] = I(NinfoState)
+Qₛₛ[n+1:Nfeatures-1,n+1:Nfeatures-1] = I(Nfeatures-n-1)
 
 Kₛₛ = lqr(System, Qₛₛ, I)
 l₀ = make_info_state([x₀;zero(x₀)], Σ₀, dyna, infoType)
@@ -53,7 +52,7 @@ x_lqr[:,1] = l₀
 x₁ = x₀
 Σ₁ = Σ₀
 for k in 1:simHorizon
-    u₀ = - K_lqr * x_lqr[1:1,k]
+    u₀ = - K_lqr * x_lqr[1:n,k]
     #U_rec[:,k] = u₀
     x_true2[:,k+1] = eKF.next_state_sample(x_true2[:,k], u₀, dyna)
     y_true = eKF.output_sample(x_true2[:,k+1], dyna)

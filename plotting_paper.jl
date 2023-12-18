@@ -1,5 +1,5 @@
 using FileIO, JLD2, LaTeXStrings, Plots, Lux
-x_lqr, x_DMD, n, features, learnt_features = FileIO.load("ExampleData.jld2", "x_lqr", "x_DMD",
+x_lqr, x_DMD, n, features, learnt_features = FileIO.load("results/ExampleData.jld2", "x_lqr", "x_DMD",
                                             "n", "features", "learnt_features")
 plt1 = plot(
                     xlim=(0,1000),
@@ -19,7 +19,7 @@ plot!(plt1, x_DMD[1,:])
 
 plt2 = plot(
                     xlim=(0,1000),
-					ylim=(0,1),
+					#ylim=(0,1),
                     framestyle = :box,
                     yguidefontsize=8,
                     xguidefontsize=8,
@@ -37,12 +37,12 @@ plot!(plt2, x_DMD[2n+1,:])
 plot(plt1,plt2, layout=(2,1), size = (280,250))
 
 
-savefig("figs/paper_figs/closed_loop_sim.pdf")
+savefig("figs/closed_loop_sim.pdf")
 
 
 
 plt1 = plot(
-                    xlim=(0,500),
+                    xlim=(0,1000),
                     framestyle = :box,
                     yguidefontsize=8,
                     xguidefontsize=8,
@@ -56,7 +56,7 @@ plt1 = plot(
                 )
 
 plt2 = plot(
-                    xlim=(0,500),
+                    xlim=(0,1000),
                     framestyle = :box,
                     yguidefontsize=8,
                     xguidefontsize=8,
@@ -78,7 +78,7 @@ plot!(plt2, learnt_features[2n+1,:], lw =1.5, linestyle=:dot)
 plot(plt1,plt2, layout=(2,1), size = (280,250))
 
 
-savefig("figs/paper_figs/learning_result.pdf")
+savefig("figs/learning_result.pdf")
 
 
 plt_ = plot(
@@ -96,4 +96,4 @@ plt_ = plot(
                 )
 
 plot!(plt_, x -> elu(3 .* (x .- 1)), lw = 1.5, font = 1, palette = :seaborn_colorblind)
-savefig("figs/paper_figs/elu_fun.pdf")
+savefig("figs/elu_fun.pdf")
