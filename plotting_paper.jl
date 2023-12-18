@@ -9,6 +9,7 @@ plt1 = plot(
                     xtickfontsize=6,
                     ytickfontsize=6,
 					ylabel = L"$\hat x_{k\mid k}$",
+                    palette = :seaborn_colorblind,
 					xticks=:none,
                     legend=:none,
                     fontfamily="Computer Modern"
@@ -25,6 +26,7 @@ plt2 = plot(
                     xtickfontsize=6,
                     ytickfontsize=6,
                     xlabel = L"k",
+                    palette = :seaborn_colorblind,
 					ylabel = L"$\sqrt{\Sigma_{k \mid k}}$",
                     legend=:none,
                     fontfamily="Computer Modern"
@@ -32,7 +34,7 @@ plt2 = plot(
 plot!(plt2, x_lqr[2n+1,:])
 plot!(plt2, x_DMD[2n+1,:])
 
-plot(plt1,plt2, layout=(2,1), size = (250,200))
+plot(plt1,plt2, layout=(2,1), size = (280,250))
 
 
 savefig("figs/paper_figs/closed_loop_sim.pdf")
@@ -40,38 +42,40 @@ savefig("figs/paper_figs/closed_loop_sim.pdf")
 
 
 plt1 = plot(
-                    xlim=(0,200),
+                    xlim=(0,500),
                     framestyle = :box,
                     yguidefontsize=8,
                     xguidefontsize=8,
                     xtickfontsize=6,
                     ytickfontsize=6,
 					ylabel = L"$\hat x_{k\mid k}$",
+                    palette = :seaborn_colorblind,
 					xticks=:none,
                     legend=:none,
                     fontfamily="Computer Modern"
                 )
 
 plt2 = plot(
-                    xlim=(0,200),
+                    xlim=(0,500),
                     framestyle = :box,
                     yguidefontsize=8,
                     xguidefontsize=8,
                     xtickfontsize=6,
                     ytickfontsize=6,
                     xlabel = L"k",
+                    palette = :seaborn_colorblind,
 					ylabel = L"$\sqrt{\Sigma_{k \mid k}}$",
                     legend=:none,
                     fontfamily="Computer Modern"
                 )
 
-plot!(plt1, features[2,:], lw=2.0)
-plot!(plt1, learnt_features[2,:], lw=1.0)#, linestyle=:dashdot)
-plot!(plt2, features[2n+1,:], lw=2.0)
-plot!(plt2, learnt_features[2n+1,:])#, linestyle=:dashdot)
+plot!(plt1, features[2,:], lw=2.0, size =(280,100))
+plot!(plt1, learnt_features[2,:], lw=1.5, linestyle=:dot)
+plot!(plt2, features[2n+1,:], lw=2.0, size =(280,100))
+plot!(plt2, learnt_features[2n+1,:], lw =1.5, linestyle=:dot)
 
 
-plot(plt1,plt2, layout=(2,1), size = (250,200))
+plot(plt1,plt2, layout=(2,1), size = (280,250))
 
 
 savefig("figs/paper_figs/learning_result.pdf")
@@ -91,5 +95,5 @@ plt_ = plot(
                     fontfamily="Computer Modern"
                 )
 
-plot!(plt_, x -> elu(3 .* (x .- 1)), lw = 1.5, font = 1)
+plot!(plt_, x -> elu(3 .* (x .- 1)), lw = 1.5, font = 1, palette = :seaborn_colorblind)
 savefig("figs/paper_figs/elu_fun.pdf")

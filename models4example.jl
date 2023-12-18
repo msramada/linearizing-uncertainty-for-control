@@ -20,7 +20,7 @@ if systemNumber == 1
 	end
 	Q = LinearAlgebra.diagm([0.2])
 	R = LinearAlgebra.diagm([0.1])
-	Q_true = 0.5 * Q
+	Q_true = 1.0 * Q
 	n = 1
 	x₀ = randn(n,)
 	Σ₀ = LinearAlgebra.diagm(rand(n,))
