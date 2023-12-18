@@ -1,5 +1,5 @@
 using Plots, ControlSystemsBase, StatsBase, LaTeXStrings
-using LinearAlgebra, Zygote
+using LinearAlgebra, Zygote, FileIO, JLD2
 include("src/eKF.jl")
 include("src/info_feature_state.jl")
 
@@ -88,5 +88,5 @@ a3 = plot!(x_true1[1,:], label="DMDc")
 plot(a1,a2,a3, layout=(3,1))
 savefig("figs/feedbackSim.png")
 
-
+FileIO.save("ExampleData.jld2", "x_lqr", x_lqr, "x_DMD", x_DMD, "n", n, "features", features, "learnt_features", learnt_features)
 include("plotting_paper.jl")
