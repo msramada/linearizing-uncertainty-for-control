@@ -8,14 +8,14 @@ plt1 = plot(
                     xguidefontsize=8,
                     xtickfontsize=6,
                     ytickfontsize=6,
-					ylabel = L"$\hat x_{k\mid k}$",
-                    palette = :seaborn_colorblind,
+					ylabel = L"$\sum_i^2 \hat x^i_{k\mid k}$",
+                    palette = :seaborn_muted,
 					xticks=:none,
                     legend=:none,
                     fontfamily="Computer Modern"
                 )
-plot!(plt1, x_lqr[1,:])
-plot!(plt1, x_DMD[1,:])
+plot!(plt1, x_lqr[1,:] .+ x_lqr[2,:])
+plot!(plt1, x_DMD[1,:] .+ x_DMD[2,:])
 
 plt2 = plot(
                     xlim=(0,1000),
@@ -26,13 +26,13 @@ plt2 = plot(
                     xtickfontsize=6,
                     ytickfontsize=6,
                     xlabel = L"k",
-                    palette = :seaborn_colorblind,
-					ylabel = L"$\sqrt{\Sigma_{k \mid k}}$",
+                    palette = :seaborn_muted,
+					ylabel = L"$\Sigma^{1,1}_{k \mid k}$",
                     legend=:none,
                     fontfamily="Computer Modern"
                 )
-plot!(plt2, x_lqr[2n+1,:])
-plot!(plt2, x_DMD[2n+1,:])
+plot!(plt2, x_lqr[2n+1,:] .^ 2)
+plot!(plt2, x_DMD[2n+1,:] .^ 2)
 
 plot(plt1,plt2, layout=(2,1), size = (280,250))
 
@@ -48,8 +48,8 @@ plt1 = plot(
                     xguidefontsize=8,
                     xtickfontsize=6,
                     ytickfontsize=6,
-					ylabel = L"$\hat x_{k\mid k}$",
-                    palette = :seaborn_colorblind,
+					ylabel = L"$\hat x^1_{k\mid k}$",
+                    palette = :seaborn_muted,
 					xticks=:none,
                     legend=:none,
                     fontfamily="Computer Modern"
@@ -63,8 +63,8 @@ plt2 = plot(
                     xtickfontsize=6,
                     ytickfontsize=6,
                     xlabel = L"k",
-                    palette = :seaborn_colorblind,
-					ylabel = L"$\sqrt{\Sigma_{k \mid k}}$",
+                    palette = :seaborn_muted,
+					ylabel = L"$L_k^{1,1}$",
                     legend=:none,
                     fontfamily="Computer Modern"
                 )
@@ -88,12 +88,12 @@ plt_ = plot(
                     xguidefontsize=8,
                     xtickfontsize=6,
                     ytickfontsize=6,
-                    xlim = (-2,2),
+                    xlim = (-5,5),
                     xlabel = L"x",
-					ylabel = L"ELU$(3(x-1))$",
+					ylabel = L"ELU$(x)$",
                     legend=:none,
                     fontfamily="Computer Modern"
                 )
 
-plot!(plt_, x -> elu(3 .* (x .- 1)), lw = 1.5, font = 1, palette = :seaborn_colorblind)
+plot!(plt_, x -> elu(x), lw = 1.5, font = 1, palette = :seaborn_muted)
 savefig("figs/elu_fun.pdf")
