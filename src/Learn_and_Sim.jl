@@ -35,8 +35,10 @@ x_DMD = zeros(NinfoState, simHorizon+1)
 x_DMD[:,1] = l₀
 x₁ = x₀
 Σ₁ = Σ₀
+U_DMD = zeros(1,simHorizon)
 for k in 1:simHorizon
     u₀ = - Kₛₛ * make_feature(x_DMD[:,k])
+    U_DMD[:,k] = u₀
     x_true1[:,k+1] = eKF.next_state_sample(x_true1[:,k], u₀, dyna)
     y_true = eKF.output_sample(x_true1[:,k+1], dyna)
     Σ₀ = Σ₁
@@ -51,9 +53,10 @@ x_lqr = zeros(NinfoState, simHorizon+1)
 x_lqr[:,1] = l₀
 x₁ = x₀
 Σ₁ = Σ₀
+U_lqr = zeros(1,simHorizon)
 for k in 1:simHorizon
     u₀ = - K_lqr * x_lqr[1:n,k]
-    #U_rec[:,k] = u₀
+    U_lqr[:,k] = u₀
     x_true2[:,k+1] = eKF.next_state_sample(x_true2[:,k], u₀, dyna)
     y_true = eKF.output_sample(x_true2[:,k+1], dyna)
     Σ₀ = Σ₁
@@ -62,5 +65,6 @@ for k in 1:simHorizon
     x_lqr[:,k+1] = make_info_state([x₁;x₀], Σ₀, dyna, infoType)
 end
 
-return x_DMD, x_lqr, Qₛₛ, x_true1, x_true2
+return x_DMD, U_DMD, x_lqr, U_lqr, Qₛₛ, x_true1, x_true2
 end
+

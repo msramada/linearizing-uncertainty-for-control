@@ -56,26 +56,29 @@ include("src/Learn_and_Sim.jl")
 learnt_features, System = learn_system(features, U_rec)
 
 simHorizon = 1000
-x_DMD, x_lqr, Qₛₛ, x_true1, x_true2 = simulate_system(System, simHorizon, x₀, Σ₀)
+x_DMD, U_DMD, x_lqr, U_lqr, Qₛₛ, x_true1, x_true2 = simulate_system(System, simHorizon, x₀, Σ₀)
 Qₛₛ = Qₛₛ[1:end-1,1:end-1]
-function save_to_results()
-avg_cost_lqr = (LinearAlgebra.tr(Qₛₛ * x_lqr * x_lqr'))/simHorizon
-see_lqr = mean((x_true2 - x_lqr[1:n,:]) .^ 2)
-Result_cost1 = "Experimental cost achieved by lqr control (per k): $avg_cost_lqr"
-Result_cost2 = "Experimental estimation error: $see_lqr"
-avg_cost_DMD = (LinearAlgebra.tr(Qₛₛ * x_DMD * x_DMD'))/simHorizon
-sse_DMD = mean((x_true1 - x_DMD[1:n,:]) .^ 2)
-Result_est_err1 = "Experimental cost achieved by eDMD control (per k): $avg_cost_DMD, reduction: $((avg_cost_lqr-avg_cost_DMD)/avg_cost_lqr)"
-Result_est_err2 = "Experimental estimation error: $sse_DMD, reduction: $((sse_lqr - sse_DMD)/sse_lqr)"
 
-print(Result_cost1,"\n",Result_cost2,"\n",Result_est_err1,"\n",Result_est_err2)
-open("results/results.txt", "w") do file
-	println(file, Result_cost1,"\n",
-	Result_cost2,"\n",Result_est_err1,"\n",Result_est_err2)
+function save_to_results()
+	avg_cost_lqr = (LinearAlgebra.tr(Qₛₛ * x_lqr * x_lqr') + sum(U_lqr .^2))/simHorizon
+	sse_lqr = mean((x_true2 - x_lqr[1:n,:]) .^ 2)
+	Result_cost1 = "Experimental cost achieved by lqr control (per k): $avg_cost_lqr"
+	Result_cost2 = "Experimental estimation error: $sse_lqr"
+	avg_cost_DMD = (LinearAlgebra.tr(Qₛₛ * x_DMD * x_DMD') + sum(U_DMD .^2))/simHorizon
+	sse_DMD = mean((x_true1 - x_DMD[1:n,:]) .^ 2)
+	Result_est_err1 = "Experimental cost achieved by eDMD control (per k): $avg_cost_DMD, reduction: $((avg_cost_lqr-avg_cost_DMD)/avg_cost_lqr)"
+	Result_est_err2 = "Experimental estimation error: $sse_DMD, reduction: $((sse_lqr - sse_DMD)/sse_lqr)"
+
+	print(Result_cost1,"\n",Result_cost2,"\n",Result_est_err1,"\n",Result_est_err2)
+	open("results/results.txt", "w") do file
+		println(file, Result_cost1,"\n",
+		Result_cost2,"\n",Result_est_err1,"\n",Result_est_err2)
+	end
+	return 1
 end
-return 1
-end
-save_to_results();
+
+save_to_results()
+
 
 FileIO.save("results/ExampleData.jld2", "x_lqr", x_lqr, "x_DMD", x_DMD, "n", n, 
 			"features", features, "learnt_features", learnt_features)
