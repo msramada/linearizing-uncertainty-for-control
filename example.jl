@@ -3,8 +3,7 @@ using LinearAlgebra, Zygote, FileIO, JLD2
 include("src/eKF.jl")
 include("src/info_feature_state.jl")
 
-##### Pick chosen example ######
-systemNumber = 2
+##### Load example model ######
 include("./models4example.jl")
 
 ##### Define Dynamic System Object #####
@@ -21,7 +20,7 @@ infoType = "cholesky" # or trace
 
 #### Collect features data #####
 function sim2learn_eKF(x₀::Vector{Float64}, Σ₀::Matrix, U_rec::Matrix)
-	η₀ = make_info_state([x₀;zero(x₀)], Σ₀, dyna, infoType)
+	η₀ = make_info_state(x₀, Σ₀, dyna, infoType)
 	NinfoState = length(η₀)
 	ηₖ = zeros(NinfoState, horizon+1)
 	ηₖ[:,1] = η₀
@@ -32,21 +31,17 @@ function sim2learn_eKF(x₀::Vector{Float64}, Σ₀::Matrix, U_rec::Matrix)
 	println("Start collecting data ... ")
 	x₁, Σ₁ = x₀, Σ₀
 	for k in 1:horizon
-		u₀ = U_rec[:,k]
-		x_true[:,k+1] = eKF.next_state_sample(x_true[:,k], u₀, dyna)
-		y_true = eKF.output_sample(x_true[:,k+1], dyna)
-		xₚ, _ = eKF.time_update(x₁, Σ₁, u₀, dyna)
-		y_true = dyna.h(xₚ)
-		Σ₀ = Σ₁
-		x₀ = x₁
-		x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
-		ηₖ[:,k+1] = make_info_state([x₁;x₀], Σ₀, dyna, infoType)
+		u₁ = U_rec[:,k]
+		x_true[:,k+1] = eKF.next_state_sample(x_true[:,k], u₁, dyna)
+		y_true = dyna.h(x₁) # during learning, yₖ - h(xₖ) = 0 => yₖ = h(xₖ)
+		x₁, Σ₁ = eKF.update(x₁, Σ₁, u₁, y_true, dyna)
+		ηₖ[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
 		features[:,k+1] = make_feature(ηₖ[:,k+1])
 	end
 	return ηₖ, features, Nfeatures, NinfoState
 end
 
-U_rec = 0.2 * randn(1, horizon)
+U_rec = 0.5 * randn(1, horizon)
 ηₖ, features, Nfeatures, NinfoState = sim2learn_eKF(x₀, Σ₀, U_rec)
 println("Features data has been collected.")
 

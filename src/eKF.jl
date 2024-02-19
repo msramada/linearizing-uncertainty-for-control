@@ -40,10 +40,10 @@ function measurement_update(x₁₀::Vector{Float64}, Σ₁₀::Matrix{Float64},
 	return x₁₁, Σ₁₁
 end
 
-function update(x₀₀::Vector{Float64}, Σ₀₀::Matrix{Float64}, u₀, y₁::Vector{Float64}, DynamicSysObj)
-	x₁₀, Σ₁₀ = time_update(x₀₀, Σ₀₀, u₀, DynamicSysObj)
+function update(x₁₀::Vector{Float64}, Σ₁₀::Matrix{Float64}, u₁, y₁::Vector{Float64}, DynamicSysObj)
 	x₁₁, Σ₁₁ = measurement_update(x₁₀, Σ₁₀, y₁, DynamicSysObj)
-	return x₁₁, Σ₁₁
+	x₂₁, Σ₂₁ = time_update(x₁₁, Σ₁₁, u₁, DynamicSysObj)
+	return x₂₁, Σ₂₁
 end
 
 function update_predictor(x₁₀::Vector{Float64}, Σ₁₀::Matrix{Float64}, u₁, y₁::Vector{Float64}, DynamicSysObj)

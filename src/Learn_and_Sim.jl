@@ -1,3 +1,5 @@
+# A supplementary code with functions used to generate simulation data
+
 function learn_system(features::Matrix, U_rec::Matrix)
 
 X₀, X₁ = features[:,1:end-1], features[:,2:end]
@@ -29,7 +31,7 @@ Qₛₛ = zero(System.A)
 Qₛₛ[n+1:Nfeatures-1,n+1:Nfeatures-1] = I(Nfeatures-n-1)
 
 Kₛₛ = lqr(System, Qₛₛ, I)
-l₀ = make_info_state([x₀;zero(x₀)], Σ₀, dyna, infoType)
+l₀ = make_info_state(x₀, Σ₀, dyna, infoType)
 x_true1 = zeros(n, simHorizon+1)
 x_DMD = zeros(NinfoState, simHorizon+1)
 x_DMD[:,1] = l₀
@@ -40,11 +42,11 @@ for k in 1:simHorizon
     u₀ = - Kₛₛ * make_feature(x_DMD[:,k])
     U_DMD[:,k] = u₀
     x_true1[:,k+1] = eKF.next_state_sample(x_true1[:,k], u₀, dyna)
-    y_true = eKF.output_sample(x_true1[:,k+1], dyna)
+    y_true = eKF.output_sample(x_true1[:,k], dyna)
     Σ₀ = Σ₁
     x₀ = x₁
     x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
-    x_DMD[:,k+1] = make_info_state([x₁;x₀], Σ₀, dyna, infoType)
+    x_DMD[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
 end
 
 
@@ -58,11 +60,11 @@ for k in 1:simHorizon
     u₀ = - K_lqr * x_lqr[1:n,k]
     U_lqr[:,k] = u₀
     x_true2[:,k+1] = eKF.next_state_sample(x_true2[:,k], u₀, dyna)
-    y_true = eKF.output_sample(x_true2[:,k+1], dyna)
+    y_true = eKF.output_sample(x_true2[:,k], dyna)
     Σ₀ = Σ₁
     x₀ = x₁
     x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
-    x_lqr[:,k+1] = make_info_state([x₁;x₀], Σ₀, dyna, infoType)
+    x_lqr[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
 end
 
 return x_DMD, U_DMD, x_lqr, U_lqr, Qₛₛ, x_true1, x_true2
