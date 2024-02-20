@@ -11,6 +11,7 @@ dyna = eKF.StateSpaceSys(stateDynamics, outputDynamics, Q, R, Q_true)
 n = dyna.n
 #### Feature vector params #####
 order = 1 # Highest degree of multinomial
+make_feature = x -> [x;elu.(x);elu.(-x);1.0]
 make_feature = x -> [x;1.0]
 horizon = 5_000
 x_true = zeros(n, horizon+1)
@@ -52,7 +53,7 @@ learnt_features, System = learn_system(features, U_rec)
 
 simHorizon = 1000
 x_DMD, U_DMD, x_lqr, U_lqr, Qₛₛ, x_true1, x_true2 = simulate_system(System, simHorizon, x₀, Σ₀)
-Qₛₛ = Qₛₛ[1:end-1,1:end-1]
+Qₛₛ = Qₛₛ[1:NinfoState,1:NinfoState]
 
 function save_to_results()
 	avg_cost_lqr = (LinearAlgebra.tr(Qₛₛ * x_lqr * x_lqr') + sum(U_lqr .^2))/simHorizon

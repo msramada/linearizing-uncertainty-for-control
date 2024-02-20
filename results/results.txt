@@ -1,4 +1,4 @@
-Experimental cost achieved by lqr control (per k): 13.065793811764339
-Experimental estimation error: 3.984125303770115
-Experimental cost achieved by eDMD control (per k): 3.0315880069157246, reduction: 0.7679752144729158
-Experimental estimation error: 0.6142907389203708, reduction: 0.8458154068751108
+Experimental cost achieved by lqr control (per k): 12.775362130238273
+Experimental estimation error: 4.259135939971094
+Experimental cost achieved by eDMD control (per k): 2.888759218148508, reduction: 0.7738804435679328
+Experimental estimation error: 0.7194399411368573, reduction: 0.8310831231318389
