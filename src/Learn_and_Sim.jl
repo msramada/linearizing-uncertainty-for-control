@@ -43,8 +43,6 @@ for k in 1:simHorizon
     U_DMD[:,k] = u₀
     x_true1[:,k+1] = eKF.next_state_sample(x_true1[:,k], u₀, dyna)
     y_true = eKF.output_sample(x_true1[:,k], dyna)
-    Σ₀ = Σ₁
-    x₀ = x₁
     x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
     x_DMD[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
 end
@@ -61,8 +59,6 @@ for k in 1:simHorizon
     U_lqr[:,k] = u₀
     x_true2[:,k+1] = eKF.next_state_sample(x_true2[:,k], u₀, dyna)
     y_true = eKF.output_sample(x_true2[:,k], dyna)
-    Σ₀ = Σ₁
-    x₀ = x₁
     x₁, Σ₁ = eKF.update(x₁, Σ₁, u₀, y_true, dyna)
     x_lqr[:,k+1] = make_info_state(x₁, Σ₁, dyna, infoType)
 end

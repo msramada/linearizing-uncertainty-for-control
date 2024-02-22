@@ -13,7 +13,7 @@ n = dyna.n
 order = 1 # Highest degree of multinomial
 make_feature = x -> [x;elu.(x);elu.(-x);1.0]
 make_feature = x -> [x;1.0]
-horizon = 5_000
+horizon = 10_000
 x_true = zeros(n, horizon+1)
 x_true[:,1] = x₀ + sqrt(dyna.Q_true) * randn(n,)
 #### Chose make_info_state: {1) cholesky: with_cholesky_Σ, 2) trace(QΣ): with_trace_QΣ}
@@ -42,7 +42,7 @@ function sim2learn_eKF(x₀::Vector{Float64}, Σ₀::Matrix, U_rec::Matrix)
 	return ηₖ, features, Nfeatures, NinfoState
 end
 
-U_rec = 0.5 * randn(1, horizon)
+U_rec = 0.2 * randn(1, horizon)
 ηₖ, features, Nfeatures, NinfoState = sim2learn_eKF(x₀, Σ₀, U_rec)
 println("Features data has been collected.")
 
