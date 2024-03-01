@@ -1,3 +1,6 @@
+module info_feature_maker
+using LinearAlgebra
+export make_info_state, back_from_cholesky_Σ, vector_infoState_update, vectorize_all
 int(x) = floor(Int, x)
 
 function make_info_state(x::Vector{Float64}, Σ::Matrix{Float64}, DynamicSysObj, infoType::String)
@@ -63,36 +66,4 @@ function vectorize_all(A::Matrix)
 	return l
 end
 
-function makeFeature1(l::Vector{Float64}, order::Int, DynamicSysObj)
-	return [makeFeature_Polys(l, order, DynamicSysObj);
-		makeFeature_Obs(l, order, DynamicSysObj)]
-end
-function makeFeature_Polys(l::Vector{Float64}, order::Int, DynamicSysObj) # returns a vector of length # * (nn²+nn)/2 + nn
-	l = [1.0; l]
-	lₚ = l
-	for i in 1:order
-		lₚ = half_vectorize(lₚ * l')
-	end
-	lₚ = [lₚ[2:end];lₚ[1]]
-	return lₚ
-end
-
-function makeFeature_Trigon(l::Vector{Float64}, order::Int, DynamicSysObj) # returns a vector of length # * (nn²+nn)/2 + nn
-	ω = 0.1:0.1:2
-	lₚ = l
-	for i in 1:length(ω)
-		lₚ = [lₚ; sin.(ω[i] .* l); cos.(ω[i] .* l)]
-	end
-	lₚ = [lₚ; 1.0]
-	return lₚ
-end
-
-function makeFeature_Obs(l::Vector{Float64}, order::Int, DynamicSysObj) # returns a vector of length # * (nn²+nn)/2 + nn
-	g = DynamicSysObj.h(l[1:DynamicSysObj.n])
-	g = [1.0; g]
-	lₚ = g
-	for i in 1:order+6
-		lₚ = half_vectorize(lₚ * g')
-	end
-	return lₚ[2:end]
 end

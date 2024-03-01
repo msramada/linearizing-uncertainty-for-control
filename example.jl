@@ -1,7 +1,12 @@
 using Plots, ControlSystemsBase, StatsBase, LaTeXStrings
 using LinearAlgebra, Zygote, FileIO, JLD2
-include("src/eKF.jl")
-include("src/info_feature_state.jl")
+
+push!(LOAD_PATH, "./src")
+### Loading the extended Kalman filter module ###
+using eKF
+### Loading information state and features maker ###
+using info_feature_maker
+#include("src/info_feature_state.jl")
 
 ##### Load example model ######
 include("./models4example.jl")
